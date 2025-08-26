@@ -90,7 +90,7 @@ export const assets = {
 
 export const menuLinks = [
     { name: "Home", path: "/" },
-    { name: "Cars", path: "/cars" },
+    { name: "Bikes", path: "/bikes" },
     { name: "My Bookings", path: "/my-bookings" },
 ]
 
@@ -124,7 +124,7 @@ export const dummyBikeData = [
         "pricePerDay": 3000,
         "location": "Bhubaneswar",
         "description": "The  BMW Urban Racer Concept is a mid-size luxury Bike produced by BMW. The Urban Racer Concept made its debut in 2015",
-        "isAvaliable": true,
+        "isAvailable": true,
         "createdAt": "2025-04-16T07:26:56.215Z",
     },
     {
@@ -141,7 +141,7 @@ export const dummyBikeData = [
         "pricePerDay": 2100,
         "location": "Cuttack",
         "description": "The BMW S 1000 RR is a litre-class sportbike designed for track-ready performance with everyday usability. First introduced globally in 2009 as a homologation model for World Superbike competition.",
-        "isAvaliable": true,
+        "isAvailable": true,
         "createdAt": "2025-04-16T08:33:57.993Z",
     },
     {
@@ -158,7 +158,7 @@ export const dummyBikeData = [
         "pricePerDay": 1800,
         "location": "Banglore",
         "description": "The Kawasaki Ninja ZX-4R is a fully faired supersport motorcycle positioned in the premium sub-500cc segment, known for being the smallest capacity four-cylinder bike currently available in India.",
-        "isAvaliable": true,
+        "isAvailable": true,
         "createdAt": "2025-04-16T08:34:39.592Z",
     },
     {
@@ -175,7 +175,7 @@ export const dummyBikeData = [
         "pricePerDay": 2099,
         "location": "Hydrabad",
         "description": "The Triumph Street Triple 765 continues its position as a benchmark in the middleweight streetfighter segment. The 2023 model year brought notable updates in styling, hardware, and electronics.",
-        "isAvaliable": true,
+        "isAvailable": true,
         "createdAt": "2025-04-17T06:15:47.318Z",
     }
 ];
@@ -183,7 +183,7 @@ export const dummyBikeData = [
 export const dummyMyBookingsData = [
     {
         "_id": "68482bcc98eb9722b7751f70",
-        "car": dummyBikeData[0],
+        "bike": dummyBikeData[0],
         "user": "6847f7cab3d8daecdb517095",
         "owner": "6847f7cab3d8daecdb517095",
         "pickupDate": "2025-06-13T00:00:00.000Z",
@@ -194,7 +194,7 @@ export const dummyMyBookingsData = [
     },
     {
         "_id": "68482bb598eb9722b7751f60",
-        "car": dummyBikeData[1],
+        "bike": dummyBikeData[1],
         "user": "6847f7cab3d8daecdb517095",
         "owner": "67fe3467ed8a8fe17d0ba6e2",
         "pickupDate": "2025-06-12T00:00:00.000Z",
@@ -205,7 +205,7 @@ export const dummyMyBookingsData = [
     },
     {
         "_id": "684800fa0fb481c5cfd92e56",
-        "car": dummyBikeData[2],
+        "bike": dummyBikeData[2],
         "user": "6847f7cab3d8daecdb517095",
         "owner": "67fe3467ed8a8fe17d0ba6e2",
         "pickupDate": "2025-06-11T00:00:00.000Z",
@@ -216,7 +216,7 @@ export const dummyMyBookingsData = [
     },
     {
         "_id": "6847fe790fb481c5cfd92d94",
-        "car": dummyBikeData[3],
+        "bike": dummyBikeData[3],
         "user": "6847f7cab3d8daecdb517095",
         "owner": "6847f7cab3d8daecdb517095",
         "pickupDate": "2025-06-11T00:00:00.000Z",

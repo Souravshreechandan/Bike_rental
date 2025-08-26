@@ -19,10 +19,11 @@ const App = () => {
       
       <Routes>
         <Route path='/' element={<Home/>} />
-        <Route path='/bike-details/:id' element={<BikeDetails/>} />
+        <Route path='/bike_details/:id' element={<BikeDetails/>} />
         <Route path='/bikes' element={<Bikes/>} />
         <Route path='/my_bookings' element={<MyBookings/>} />
       </Routes>
+      
 
       {!isOwnerPath && <Footer/>}
     </>
