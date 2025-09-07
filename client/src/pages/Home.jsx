@@ -5,6 +5,7 @@ import Banner from '../components/Banner'
 import Testimonial from '../components/Testimonial'
 import Newsletter from '../components/Newsletter'
 
+
 const Home = () => {
   return (
     <>
@@ -13,6 +14,7 @@ const Home = () => {
      <Banner/>
      <Testimonial/>
      <Newsletter/>
+     
     </>
   )
 }
