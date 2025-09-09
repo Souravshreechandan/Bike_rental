@@ -12,7 +12,7 @@ import location_icon from "./location_icon.svg"
 import fuel_icon from "./fuel_icon.svg"
 import addIcon from "./addIcon.svg"
 import carIcon from "./carIcon.svg"
-import carIconColored from "./carIconColored.svg"
+import bikeIconColored from "./bikeIconColored.svg"
 import dashboardIcon from "./dashboardIcon.svg"
 import dashboardIconColored from "./dashboardIconColored.svg"
 import addIconColored from "./addIconColored.svg"
@@ -59,7 +59,7 @@ export const assets = {
     fuel_icon,
     addIcon,
     carIcon,
-    carIconColored,
+    bikeIconColored,
     dashboardIcon,
     dashboardIconColored,
     addIconColored,
@@ -96,14 +96,14 @@ export const menuLinks = [
 
 export const ownerMenuLinks = [
     { name: "Dashboard", path: "/owner", icon: dashboardIcon, coloredIcon: dashboardIconColored },
-    { name: "Add car", path: "/owner/add-car", icon: addIcon, coloredIcon: addIconColored },
-    { name: "Manage Cars", path: "/owner/manage-cars", icon: carIcon, coloredIcon: carIconColored },
+    { name: "Add bikes", path: "/owner/add-bike", icon: addIcon, coloredIcon: addIconColored },
+    { name: "Manage bikes", path: "/owner/manage-bikes", icon: carIcon, coloredIcon: bikeIconColored },
     { name: "Manage Bookings", path: "/owner/manage-bookings", icon: listIcon, coloredIcon: listIconColored },
 ]
 
 export const dummyUserData = {
   "_id": "6847f7cab3d8daecdb517095",
-  "name": "GreatStack",
+  "name": "Owner",
   "email": "admin@example.com",
   "role": "owner",
   "image": user_profile,
@@ -117,7 +117,7 @@ export const dummyBikeData = [
         "model": "URC",
         "image": bike_image1,
         "year": 2015,
-        "category": "Bikes",
+        "category": "Bike",
         "seating_capacity": 2,
         "fuel_type": "Petrol",
         "transmission": "Semi-Automatic",
@@ -228,7 +228,7 @@ export const dummyMyBookingsData = [
 ]
 
 export const dummyDashboardData = {
-    "totalCars": 4,
+    "totalBikes": 4,
     "totalBookings": 2,
     "pendingBookings": 0,
     "completedBookings": 2,

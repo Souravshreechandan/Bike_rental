@@ -6,6 +6,11 @@ import BikeDetails from './pages/BikeDetails'
 import Bikes from './pages/Bikes'
 import MyBookings from './pages/MyBookings'
 import Footer from './components/Footer'
+import Layout from './pages/owner/Layout'
+import Dashboard from './pages/owner/Dashboard'
+import AddBike from './pages/owner/AddBike'
+import ManageBikes from './pages/owner/ManageBikes'
+import ManageBooking from './pages/owner/ManageBooking'
 
 
 
@@ -22,6 +27,13 @@ const App = () => {
         <Route path='/bike_details/:id' element={<BikeDetails/>} />
         <Route path='/bikes' element={<Bikes/>} />
         <Route path='/my-bookings' element={<MyBookings/>} />
+        <Route path='/owner' element={<Layout/>}>
+          <Route index element={<Dashboard/>}/>
+          <Route path='add-bike' element={<AddBike/>}/>
+          <Route path='manage-bikes' element={<ManageBikes/>}/>
+          <Route path='manage-bookings' element={<ManageBooking/>}/>
+        </Route>
+
       </Routes>
       
 
