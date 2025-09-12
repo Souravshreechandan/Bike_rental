@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { assets, menuLinks } from '../assets/assets';
 
-const Navbar = () => {
+const Navbar = ({setShowLogin}) => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const Navbar = () => {
         </div>
         <div className="flex max-sm:flex-col items-start sm:items-center gap-6">
           <button onClick={() => navigate('/owner')} className="cursor-pointer">Dashboard</button>
-          <Link to="/login" className="cursor-pointer px-8 py-2 bg-primary hover:bg-primary-dull transition-all text-white rounded-lg">Login</Link>
+          <button onClick={() => setShowLogin(true)} className="cursor-pointer px-8 py-2 bg-primary hover:bg-primary-dull transition-all text-white rounded-lg">Login</button>
         </div>
       </div>
 
