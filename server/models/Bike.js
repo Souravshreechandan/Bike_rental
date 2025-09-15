@@ -1,24 +1,23 @@
-import mongoose, { model } from "mongoose";
+import mongoose from "mongoose";
 
-const {objectId} = mongoose.Schema.Types
+const { ObjectId } = mongoose.Schema.Types;
 
 const bikeSchema = new mongoose.Schema({
-    owner:{type: objectId, ref:"User"},
-    brand:{type: String, require:true},
-    model:{type: String, require:true},
-    Image:{type: String, require:true},
-    year:{type: Number, require:true},
-    category:{type: String, require:true},
-    seating_capacity:{type: Number, require:true},
-    fuel_type:{type: String, require:true},
-    transmission:{type: String, require:true},
-    pricePerDay:{type: Number, require:true},
-    location:{type: String, require:true},
-    description:{type: String, require:true},
-    isAvaliable:{type: Boolean, default:true}, 
+    owner: { type: ObjectId, ref: "User" },
+    brand: { type: String, required: true },
+    model: { type: String, required: true },
+    image: { type: String, required: true },
+    year: { type: Number, required: true },
+    category: { type: String, required: true },
+    seating_capacity: { type: Number, required: true },
+    fuel_type: { type: String, required: true },
+    transmission: { type: String, required: true },
+    pricePerDay: { type: Number, required: true },
+    location: { type: String, required: true },
+    description: { type: String, required: true },
+    isAvaliable: { type: Boolean, default: true },
+}, { timestamps: true });
 
-},{timestamps:true})
-
-const Bike = mongoose.model('Bike', bikeSchema)
+const Bike = mongoose.model('Bike', bikeSchema);
 
 export default Bike;

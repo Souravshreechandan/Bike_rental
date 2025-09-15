@@ -1,9 +1,18 @@
 import express from "express"
 import { protect } from "../middleware/auth.js";
-import { changeRoleToOwner } from "../controllers/ownerController.js";
+import { addBike, changeRoleToOwner, deleteBike, getOwnerBikes, 
+toggleBikeAvailability, updateUserImage } from "../controllers/ownerController.js";
+import upload from "../middleware/multer.js";
 
 const ownerRouter = express.Router();
 
 ownerRouter.post("/change-role",protect,changeRoleToOwner)
+ownerRouter.post("/add-bike", upload.single("image"),protect,addBike)
+ownerRouter.get("/bikes",protect,getOwnerBikes)
+ownerRouter.post("/toggle-bike",protect,toggleBikeAvailability)
+ownerRouter.post("/delete-bike",protect,deleteBike)
+
+ownerRouter.post('/dashboard', protect, deleteBike)
+ownerRouter.post('update-image', upload.single("image"),protect,updateUserImage)
 
 export default ownerRouter;
