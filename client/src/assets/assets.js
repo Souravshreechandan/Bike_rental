@@ -41,7 +41,7 @@ import bike_image2 from "./bike_image2.png"
 import bike_image3 from "./bike_image3.png"
 import bike_image4 from "./bike_image4.png"
 
-export const cityList = ['New York', 'Los Angeles', 'Houston', 'Chicago']
+export const cityList = ['Bhubaneswar', 'Cuttack']
 
 export const assets = {
     logo,
@@ -156,7 +156,7 @@ export const dummyBikeData = [
         "fuel_type": "Hybrid",
         "transmission": "Automatic",
         "pricePerDay": 1800,
-        "location": "Banglore",
+        "location": "Bhubaneswar",
         "description": "The Kawasaki Ninja ZX-4R is a fully faired supersport motorcycle positioned in the premium sub-500cc segment, known for being the smallest capacity four-cylinder bike currently available in India.",
         "isAvailable": true,
         "createdAt": "2025-04-16T08:34:39.592Z",
@@ -173,7 +173,7 @@ export const dummyBikeData = [
         "fuel_type": "Petrol",
         "transmission": "Manual",
         "pricePerDay": 2099,
-        "location": "Hydrabad",
+        "location": "Cuttack",
         "description": "The Triumph Street Triple 765 continues its position as a benchmark in the middleweight streetfighter segment. The 2023 model year brought notable updates in styling, hardware, and electronics.",
         "isAvailable": true,
         "createdAt": "2025-04-17T06:15:47.318Z",
