@@ -15,13 +15,13 @@ const Bikes = () => {
       transition={{duration: 0.6, ease:"easeOut"}}
 
       className='flex flex-col items-center py-20 bg-light max-md:px-4'>
-        <Title title='Available Cars' subTitle='Browse our selection of premium 
+        <Title title='Available bikes' subTitle='Browse our selection of premium 
         vehicles available for your next adventure'/>
 
         <motion.div 
         initial = {{opacity: 0, y: 20}}
         animate={{opacity: 1, y: 0}}
-        transition={{duration: 0.3, duration: 0.5}}
+        transition={{delay: 0.3, duration: 0.5}}
         className='flex items-center bg-white px-4 mt-6 max-w-140 w-full h-12 rounded-full shadow'>
           <img src={assets.search_icon} alt="" className='w-4.5 h-4.5 mr-2' />
 
@@ -48,7 +48,7 @@ const Bikes = () => {
             <motion.div key={index}
             initial = {{opacity: 0, y: 20}}
             animate={{opacity: 1, y: 0}}
-            transition={{duration: 0.1 * index, duration:0.4}}
+            transition={{delay: 0.1 * index, duration:0.4}}
             >
 
               <BikeCard bike={bike}/>

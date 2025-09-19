@@ -18,7 +18,7 @@ const Hero = () => {
        className='text-5xl md:text-5xl font-semibold'>Luxury bikes on Rent</motion.h1>
       <motion.form
       initial = {{scale: 0.95, opacity: 0, y: 50}} 
-      animate={{scale: 1, y: 0, opacity: 1, y: 1}}
+      animate={{scale: 1, opacity: 1, y: 0}}
       transition={{duration: 0.6, delay: 0.4}}
 
       className='flex flex-col md:flex-row items-start md:items-center justify-between
