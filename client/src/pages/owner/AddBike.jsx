@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import Title from '../../components/owner/Title'
 import { assets } from '../../assets/assets'
+import { useAppContext } from '../../context/AppContext'
+import toast from 'react-hot-toast'
 
 const AddBike = () => {
 
-    const currency= import.meta.env.VITE_CURRENCY
+    const {axios,currency} = useAppContext()
 
     const [image,setImage]=useState(null)
     const [bike,setBike]=useState({
@@ -19,8 +21,43 @@ const AddBike = () => {
         location:'',
         description:'',
     })
-     const onSubmitHandeler = async(e)=>{
+    const [isLoading, setIsLoading] = useState(false)
+    const onSubmitHandeler = async(e)=>{
         e.preventDefault();
+        if(isLoading) return null
+
+        setIsLoading(true)
+
+        try {
+            const formData = new FormData()
+            formData.append('image' , image)
+            formData.append('bikeData', JSON.stringify(bike))
+
+            const {data} = await axios.post('/api/owner/add-bike', formData)
+
+            if(data.success){
+                toast.success(data.message)
+                setImage(null)
+                setBike({
+                    brand:'',
+                    model:'',
+                    pricePerDay:0,
+                    year:0,
+                    transmission:'',
+                    category:'',
+                    seating_capacity:'',
+                    fuel_type:'',
+                    description:'',
+                    location:'',
+                })
+            }else{
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }finally{
+            setIsLoading(false)
+        }
      }
 
   return (
@@ -154,7 +191,7 @@ const AddBike = () => {
                 <button className='flex items-center gap-2 px-4 py-2.5 mt-4 bg-primary
                 text-white rounded-md font-medium w-max cursor-pointer'>
                     <img src={assets.tick_icon} alt="" />
-                    List your Bike
+                    {isLoading ? 'Listing...' : 'List Your Bike'}
                 </button>
 
         </form>

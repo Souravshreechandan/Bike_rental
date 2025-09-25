@@ -4,10 +4,12 @@ import { assets, dummyBikeData } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import BikeCard from './BikeCard'
 import {motion} from 'motion/react'
+import { useAppContext } from '../context/AppContext'
 
 
 const FeaturedSection = () => {
     const navigate =useNavigate()
+    const {bikes} = useAppContext()
   return (
     <motion.div 
     initial = {{opacity: 0, y: 40}}
@@ -29,7 +31,7 @@ const FeaturedSection = () => {
         transition={{delay:0.5, duration: 1}}
       className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-18'>
         {
-            dummyBikeData.slice(0,6).map((bike)=>(
+            bikes.slice(0,6).map((bike)=>(
                 <motion.div key={bike._id}
                 initial = {{opacity: 0, scale: 0.95}}
                 whileInView={{opacity: 1, scale: 1}}
