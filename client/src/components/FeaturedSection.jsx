@@ -1,6 +1,6 @@
 import React from 'react'
 import Title from './Title'
-import { assets, dummyBikeData } from '../assets/assets'
+import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import BikeCard from './BikeCard'
 import {motion} from 'motion/react'

@@ -26,9 +26,11 @@ const Dashboard = () => {
 
     const fetchDashboardData = async ()=>{
         try {
-            const {data} = await axios.get('/api/owner/dashboard')
+            const {data} = await axios.get("/api/owner/dashboard")
+            
             if (data.success){
-                setData(data.dashboardData)
+               setData(data.dashboardData)
+      
             }else{
                 toast.error(data.message)
             }
@@ -67,6 +69,7 @@ const Dashboard = () => {
             <div className='p-4 md:p-6 border border-borderColor rounded-md max-w-lg w-full'>
                 <h1 className='text-lg font-medium'>Recent Bookings</h1>
                 <p className='text-gray-500'>Latest coustmer booking</p>
+                {/*  */}
                 {Array.isArray(data.recentBookings) && data.recentBookings.map((booking,index)=>(
                     <div key={index} className='mt-4 flex items-center justify-between'>
                         <div className='flex items-center gap-2'>

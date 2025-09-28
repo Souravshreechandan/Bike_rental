@@ -4,19 +4,21 @@ import Booking from "../models/Booking.js";
 import User from "../models/User.js";
 import fs from 'fs'
 
+
+
 //api to change role of user
 export const changeRoleToOwner = async(req,res)=>{
     try {
         const{_id}= req.user;
         await User.findByIdAndUpdate(_id,{role:"owner"})
-        res.json({success:true, message:"Now you can list cars"})
+        res.json({success:true, message:"Now you can list Bike"})
     } catch (error) {
         console.log(error.message);
         res.json({success:false,message:error.message})
     }
 }
 
-//api to list car
+//api to list Bike
 
 export const addBike = async(req,res)=>{
     try {
@@ -60,7 +62,7 @@ export const getOwnerBikes = async(req,res)=>{
     try {
         const{_id} = req.user;
         const bikes = await Bike.find({owner: _id})
-        res.json({ success: true, bikes }); //
+        res.json({ success: true, bikes }); 
     } catch (error) {
         console.log(error.message)
         res.json({success: false, message: error.message})
@@ -71,13 +73,13 @@ export const getOwnerBikes = async(req,res)=>{
 
 export const toggleBikeAvailability= async(req,res)=>{
     try {
-        const{_id} = req.user;
+        const {_id} = req.user;
         const {bikeId}= req.body
         const bike = await Bike.findById(bikeId)
 
         //checking is bike belongs to he user
         if(bike.owner.toString() !== _id.toString()){
-            return  res.json({success:false,message:"Unauthorized"})
+            return res.json({success:false,message:"Unauthorized"})
         }
         bike.isAvailable = !bike.isAvailable
         await bike.save()
@@ -99,7 +101,7 @@ export const deleteBike= async(req,res)=>{
 
         //checking is bike belongs to he user
         if(bike.owner.toString() !== _id.toString()){
-            return  res.json({success:false,message:"Unauthorized"})
+            return res.json({success:false,message:"Unauthorized"})
         }
         bike.owner = null
         bike.isAvailable = false
@@ -115,7 +117,7 @@ export const deleteBike= async(req,res)=>{
 //api to get dashboard data
 export const getDashboardData = async (req,res)=>{
     try {
-        const {_id,role}=req.user
+        const { _id, role}= req.user
 
         if(role !== 'owner'){
             return res.json({success:false,message: "Unauthorized"})
@@ -130,8 +132,9 @@ export const getDashboardData = async (req,res)=>{
 
         //calculate monthly revenue from bookings where status is confirmed
 
-        const monthlyRevenue = bookings.slice().filter(booking => booking.
-        status === 'confirmed').reduce((acc, booking)=> acc + booking.price, 0)
+        const monthlyRevenue = bookings.slice()
+        .filter(booking => booking.status === 'confirmed')
+        .reduce((acc, booking)=> acc + booking.price, 0)
 
         const dashboardData = {
             

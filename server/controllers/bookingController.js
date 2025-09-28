@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Bike from "../models/Bike.js";
 import Booking from "../models/Booking.js"
 
@@ -14,7 +15,7 @@ const checkAvailability = async (bike,pickupDate,returnDate)=>{
 }
 
 //Api to check availability of bikes for the given location
-export const checkAvailabilityOfBikes = async (req,res)=>{
+export const checkAvailabilityOfBike = async (req,res)=>{
     try {
         const {location, pickupDate, returnDate}= req.body
 
@@ -56,7 +57,17 @@ export const createBooking= async(req,res)=>{
         const noOfDays = Math.ceil((returned-picked)/(1000*60*60*24))
         const price = bikeData.pricePerDay * noOfDays;
 
-        await Booking.create({bike, owner: bikeData.owner, user: _id, pickupDate, returnDate, price })// update
+        await Booking.create(
+            {
+                bike, 
+                owner: bikeData.owner, 
+                user: _id,
+                pickupDate, 
+                returnDate, 
+                price,
+               // status: "pending",
+            })
+                // update
 
         res.json({success: true, message: "Booking Created"})
 
@@ -66,14 +77,15 @@ export const createBooking= async(req,res)=>{
     }
 }
 
-//Api to list user booking
+//Api to get list of  user booking
 
 export const getUserBookings = async (req,res)=>{
     try {
-      const {_id} = req.user;
+      const { _id } = req.user;
       const bookings = await Booking.find({user: _id})
       .populate("bike")
       .sort({createdAt:-1})
+       console.log('user Bookings:', bookings);
       res.json({success:true,bookings})
 
     } catch (error) {
@@ -87,11 +99,22 @@ export const getUserBookings = async (req,res)=>{
 export const getOwnerBookings = async(req,res)=>{
     try {
         if(req.user.role !== 'owner'){
-            return res.json({success:false,message:"Unauthorized"})
+            return res.json({success:false, message:"Unauthorized"})
         }
+         // Fetch bookings for this owner and populate properly
+
         const bookings = await Booking.find({owner: req.user._id})
-        .populate('bike user').select("-user.password")
-        .sort({createdAt:-1})
+        
+        // .populate("bike", "brand model image") // ✅ populate bike details
+        // .populate('user','-password')
+        // .sort({createdAt:-1});
+
+        .populate('bike user')
+        .select("-user.password")
+        .sort({createdAt: -1})
+        
+        console.log('get Owner Bookings:', bookings);
+
         res.json({success:true,bookings})
     
     } catch (error) {

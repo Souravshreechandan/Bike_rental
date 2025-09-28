@@ -46,7 +46,15 @@ export const loginUser = async (req,res)=>{
             return res.json({success:false, message:"invalid Credentials"})
         }
         const token = generateTokan(user._id.toString())
-        res.json({success: true,token})
+        res.json({success: true,
+            token,
+            user: {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,   // ✅ Add this
+            }
+        });
     } catch (error) {
         console.log(error.message);
         res.json({success:false, message: error.message})
@@ -69,7 +77,7 @@ export const getUserData = async(req,res)=>{
 
 export const getBikes= async(req,res)=>{
     try {
-        const bikes = await Bike.find({isAvaliable: true})
+        const bikes = await Bike.find({isAvailable: true})
         res.json({success: true, bikes})
     } catch (error) {
         console.log(error.message);

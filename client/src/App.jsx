@@ -10,14 +10,15 @@ import Layout from './pages/owner/Layout';
 import Dashboard from './pages/owner/Dashboard';
 import AddBike from './pages/owner/AddBike';
 import ManageBikes from './pages/owner/ManageBikes';
-import ManageBooking from './pages/owner/ManageBooking';
+import ManageBookings from './pages/owner/ManageBookings';
 import Login from './components/Login';
 import {Toaster} from 'react-hot-toast'
 import { useAppContext } from './context/AppContext';
 
+
 const App = () => {
   const {showLogin} = useAppContext()
-  const location = useLocation();
+  
   const isOwnerPath = useLocation().pathname.startsWith('/owner');
 
   return (
@@ -36,7 +37,7 @@ const App = () => {
           <Route index element={<Dashboard />} />
           <Route path="add-bike" element={<AddBike />} />
           <Route path="manage-bikes" element={<ManageBikes />} />
-          <Route path="manage-bookings" element={<ManageBooking />} />
+          <Route path="manage-bookings" element={<ManageBookings />} />
         </Route>
       </Routes>
 

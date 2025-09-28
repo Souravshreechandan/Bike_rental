@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { assets, dummyBikeData } from '../assets/assets'
-import Loder from '../components/Loder'
+import { assets } from '../assets/assets'
 import {motion} from 'motion/react'
 import { useAppContext } from '../context/AppContext'
 import toast from 'react-hot-toast'
+import Loader from '../components/Loader'
 
 const BikeDetails = () => {
+
   const {id}=useParams()
   const {bikes, axios, pickupDate, setPickupDate, returnDate, setReturnDate} = useAppContext()
   const navigate = useNavigate()
@@ -140,12 +141,12 @@ const BikeDetails = () => {
           <button className='w-full bg-primary hover:bg-primary-dull transition-all 
           py-3 font-medium text-white rounded-xl cursor-pointer'>Book Now</button>
 
-          <p className='text-center text-sm'>We also accepted credit card</p>
+          <p className='text-center text-sm'>We also accept credit card</p>
 
         </motion.form>
       </div>
     </div>
-  ): <Loder/>
+  ): <Loader/>
 }
 
 export default BikeDetails

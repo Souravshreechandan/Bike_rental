@@ -4,7 +4,7 @@ import {motion} from 'motion/react'
 import { useAppContext } from '../context/AppContext'
 
 const Hero = () => {
-    const[pickupLocation, setPickupLocatio]=useState('')
+    const[pickupLocation, setPickupLocation]=useState('')
 
     const {pickupDate, setPickupDate, returnDate, setReturnDate, navigate} = useAppContext()
 
@@ -38,7 +38,7 @@ const Hero = () => {
 
             <div className='flex flex-col items-start gap-2'>
                 <select required value={pickupLocation} 
-                onChange={(e)=>setPickupLocatio(e.target.value)}>
+                onChange={(e)=>setPickupLocation(e.target.value)}>
 
                     <option value="">Pickup Location</option>
                     {cityList.map((city)=> <option key={city} value={city}>{city}</option> )}
