@@ -44,6 +44,7 @@ const ManageBookings = () => {
         <table className='w-full border-collapse text-left text-sm text-gray-600'>
           <thead className='text-gray-600'>
             <tr>
+            <th className='p-3 font-medium'>Sl.No</th>  
             <th className='p-3 font-medium'>Bike</th>
             <th className='p-3 font-medium max-md:hidden'>Date Range</th>
             <th className='p-3 font-medium'>Total</th>
@@ -54,6 +55,7 @@ const ManageBookings = () => {
           <tbody>
             {bookings.map((booking,index)=>(
               <tr key={index} className='border-t border-borderColor text-gray-500'>
+                <td className='p-3'>{index + 1}</td>
                 <td className='p-3 flex items-center gap-3'>
                   <img src={booking.bike.image} alt="" className='h-12 w-12 
                   aspect-square rounded-md object-cover' />

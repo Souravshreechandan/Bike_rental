@@ -4,7 +4,18 @@ import Booking from "../models/Booking.js";
 import User from "../models/User.js";
 import fs from 'fs'
 
+// Get all registered users (for admin/owner panel)
+export const getAllUsers = async (req, res) => {
+  try {
+     // Only get users where role = "user"
+    const users = await User.find({ role: "user" }).select("-password"); // don't send password
 
+    res.json({success: true, users});
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.json({ success: false, message: "Server error" });
+  }
+};
 
 //api to change role of user
 export const changeRoleToOwner = async(req,res)=>{
@@ -18,8 +29,49 @@ export const changeRoleToOwner = async(req,res)=>{
     }
 }
 
-//api to list Bike
+// Toggle block user
+export const toggleBlockUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
 
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: user.isBlocked ? "User blocked" : "User unblocked",
+      user,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// Delete user
+export const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, message: "User deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+
+
+//api to list Bike
 export const addBike = async(req,res)=>{
     try {
         const {_id} = req.user
@@ -57,7 +109,6 @@ export const addBike = async(req,res)=>{
 }
 
 //api to list owner bikes
-
 export const getOwnerBikes = async(req,res)=>{
     try {
         const{_id} = req.user;
@@ -70,7 +121,6 @@ export const getOwnerBikes = async(req,res)=>{
 }
 
 //api to toggle bike availability
-
 export const toggleBikeAvailability= async(req,res)=>{
     try {
         const {_id} = req.user;
@@ -92,7 +142,6 @@ export const toggleBikeAvailability= async(req,res)=>{
 }
 
 //api to delete bike 
-
 export const deleteBike= async(req,res)=>{
     try {
         const{_id} = req.user;
@@ -188,4 +237,5 @@ export const updateUserImage = async(req,res)=>{
         console.log(error.message);
         res.json({success:false, message:error.message})
     }
-}
+};
+

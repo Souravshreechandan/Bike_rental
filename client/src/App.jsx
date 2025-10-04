@@ -14,6 +14,8 @@ import ManageBookings from './pages/owner/ManageBookings';
 import Login from './components/Login';
 import {Toaster} from 'react-hot-toast'
 import { useAppContext } from './context/AppContext';
+import ManageUsers from './pages/owner/ManageUsers';
+
 
 
 const App = () => {
@@ -38,6 +40,7 @@ const App = () => {
           <Route path="add-bike" element={<AddBike />} />
           <Route path="manage-bikes" element={<ManageBikes />} />
           <Route path="manage-bookings" element={<ManageBookings />} />
+          <Route path="manage-users" element={<ManageUsers />} />
         </Route>
       </Routes>
 

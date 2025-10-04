@@ -11,7 +11,7 @@ export const AppProvider = ({children})=>{
 
     const navigate = useNavigate()
     const currency = import.meta.env.VITE_CURRENCY 
-    const [token, setToken] = useState(null)
+    const [token, setToken] = useState(localStorage.getItem('token') || null)
     const [user, setUser] = useState(null)
     const [isOwner,setIsOwner] = useState(false)
     const [showLogin, setShowLogin] = useState(false)
@@ -21,21 +21,37 @@ export const AppProvider = ({children})=>{
     const [bikes, setBikes] = useState([])
 
     //function to check if user is iogged in
-    const fetchUser = async()=>{
+    const fetchUser = async () => {
         try {
-            const {data} = await axios.get('/api/user/data')
-            if(data.success){
-                setUser(data.user)
-                setIsOwner(data.user.role === 'owner')
-                navigate('/owner')
-            }else{
-                navigate('/')
-            }
-            
-        } catch (error) {
-            toast.error(error.message)
+            const { data } = await axios.get('/api/user/data');
+        if (data.success) {
+        // 🔒 Blocked user check
+        if (data.user.isBlocked) {
+            toast.error("Your account has been blocked. Logging out...");
+            logout(); // logs out and navigates to login
+            return;
         }
+
+        // Save user state
+        setUser(data.user);
+        setIsOwner(data.user.role === 'owner');
+
+        // Conditional redirect
+        if (data.user.role === 'owner') {
+            navigate('/owner');
+        } else {
+            navigate('/'); // normal user goes to homepage
+        }
+
+        } else {
+        navigate('/'); // fallback if not success
+        }
+
+    } catch (error) {
+        toast.error(error.message);
     }
+};
+
     //function to fetch all bike from the server
     const fetchBikes = async()=>{
         try {
@@ -51,8 +67,9 @@ export const AppProvider = ({children})=>{
         setToken(null)
         setUser(null)
         setIsOwner(false)
-        axios.defaults.headers.common['Authorization'] = ''
+        axios.defaults.headers.common['Authorization'] = ""
         toast.success("You have been logged out")
+        navigate("/login");
     }
 
     //useEffect to retrieve the token from localStorage
@@ -60,13 +77,16 @@ export const AppProvider = ({children})=>{
         const token = localStorage.getItem('token')
         setToken(token)
         fetchBikes()
+        
     },[])
 
     //useEffect to fetch user data when token is available
     useEffect(()=>{
         if(token){
-            axios.defaults.headers.common['Authorization'] = `${token}`
+            localStorage.setItem('token', token);
+            axios.defaults.headers.common['Authorization'] = token
             fetchUser()
+            fetchBikes();
         }
     },[token])
      

@@ -176,7 +176,6 @@ const AddBike = () => {
                         <option value="">Locaion</option>
                         <option value="Bhubaneswar">Bhubaneswar</option>
                         <option value="Cuttack">Cuttack</option>
-                        <option value="Puri">Puri</option>
                     </select>
                 </div>
                 {/* {car description} */}

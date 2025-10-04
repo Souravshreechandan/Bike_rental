@@ -53,6 +53,14 @@ const Navbar = () => {
 
           <button onClick={() => isOwner ? navigate('/owner') :  navigate('/')} 
           className="cursor-pointer"> {isOwner && 'Dashboard'}</button>
+          
+
+          {/* Welcome message */}
+          {user ? (
+            <p className="px-4 py-2 text-gray-700">Welcome, {user.name}</p>
+          ) : (
+            null
+          )}
 
           <button onClick={() => { user ? logout() : setShowLogin(true)}} className="cursor-pointer px-8 py-2
            bg-primary hover:bg-primary-dull transition-all text-white rounded-lg">

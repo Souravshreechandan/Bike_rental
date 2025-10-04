@@ -72,6 +72,7 @@ const ManageBikes = () => {
         <table className='w-full border-collapse text-left text-sm text-gray-600'>
           <thead className='text-gray-600'>
             <tr>
+            <th className='p-3 font-medium'>Sl.No</th>
             <th className='p-3 font-medium'>Bike</th>
             <th className='p-3 font-medium max-md:hidden'>Category</th>
             <th className='p-3 font-medium'>Price</th>
@@ -82,6 +83,7 @@ const ManageBikes = () => {
           <tbody>
             {bikes.map((bike,index)=>(
               <tr key={index} className='border-t border-borderColor'>
+                <td className='p-3'>{index + 1}</td>
                 <td className='p-3 flex items-center gap-3'>
                   <img src={bike.image} alt="" className='h-12 w-12 aspect-square rounded-md object-cover' />
                   <div className='max-md:hidden'>
@@ -99,11 +101,13 @@ const ManageBikes = () => {
                   </span>
                 </td>
 
-                <td className='flex items-center p-3'>
+                <td className='flex items-center gap-3 p-3'>
                   <img onClick={()=> toggleAvailability(bike._id)} src={bike.isAvailable ? assets.eye_close_icon : 
                     assets.eye_icon} alt="" className='cursor-pointer' />
 
-                  <img onClick={()=> deleteBike(bike._id)} src={assets.delete_icon} alt="" className='cursor-pointer'/>  
+                  <img onClick={()=> deleteBike(bike._id)} src={assets.delete_icon} alt="" 
+                  className='cursor-pointer'/>  
+                   
                 </td>
               </tr>
             ))}

@@ -80,6 +80,11 @@ const Dashboard = () => {
                             <div>
                                 <p>{booking.bike.brand} {booking.bike.model}</p>
                                 <p className='text-sm text-gray-500'>{booking.createdAt.split("T")[0]}</p>
+                                
+                                {/* user data to see in owner page */}
+                                <p className='text-sm text-gray-700'>Booked by: {booking.user?.name}</p>
+                                <p className='text-xs text-gray-500'>{booking.user?.email}</p> 
+                                
                             </div>
                         </div>
 

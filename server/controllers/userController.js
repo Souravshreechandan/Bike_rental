@@ -41,6 +41,12 @@ export const loginUser = async (req,res)=>{
         if(!user){
             return res.json ({success: false, message: "User not found"})
         }
+
+         // 🔒 Blocked user check
+        if (user.isBlocked) {
+        return res.json({ success: false, message: "Your account has been blocked. Contact admin." });
+        }
+
         const isMatch = await bcrypt.compare(password,user.password)
         if(!isMatch){
             return res.json({success:false, message:"invalid Credentials"})
@@ -52,7 +58,7 @@ export const loginUser = async (req,res)=>{
             _id: user._id,
             name: user.name,
             email: user.email,
-            role: user.role,   // ✅ Add this
+            role: user.role,   //  Add this
             }
         });
     } catch (error) {
