@@ -10,6 +10,13 @@ const bookingSchema = new mongoose.Schema({
     returnDate: {type: Date, required:true},
     status: {type: String, enum:["pending","confirmed","cancelled"],default:"pending"},
     price: {type: Number, required:true},
+
+    // 💰 New payment fields
+    paymentMethod: {type: String,enum: ["offline", "online"],default: "offline",},
+    paidAmount: { type: Number, default: 0 },
+    pendingAmount: { type: Number, default: 0 },
+    paymentStatus: {type: String,enum: ["unpaid", "partial", "complete"],default: "unpaid", },
+
 }, { timestamps: true });
 
 const Booking = mongoose.model('Booking', bookingSchema);

@@ -45,11 +45,11 @@ const ManageBookings = () => {
           <thead className='text-gray-600'>
             <tr>
             <th className='p-3 font-medium'>Sl.No</th>  
-            <th className='p-3 font-medium'>Bike</th>
+            <th className='p-3 font-medium text-center'>Bike</th>
             <th className='p-3 font-medium max-md:hidden'>Date Range</th>
             <th className='p-3 font-medium'>Total</th>
-            <th className='p-3 font-medium max-md:hidden'>Payment</th>
-            <th className='p-3 font-medium'>Actions</th>
+            <th className='p-3 font-medium max-md:hidden text-center'>Payment</th>
+            <th className='p-3 font-medium text-center'>Actions</th>
           </tr>
           </thead>
           <tbody>
@@ -69,8 +69,20 @@ const ManageBookings = () => {
                 </td>
 
                 <td className='p-3'>{currency}{booking.price}</td>
-                <td className='p-3 max-md:hidden'>
-                  <span className='bg-gray-100 px-3 py-1 rounded-full text-xs'>offline</span>
+
+                <td className='p-3 max-md:hidden text-center justify-center'>
+                  {/* 🔹 UPDATED: show payment status dynamically */}
+                  {booking.paymentStatus === 'paid' && (
+                  <span className='bg-gray-100 px-3 py-1 rounded-full text-xs inline-block text-center'>Paid</span>
+                  )}
+                  {booking.paymentStatus === 'partial' && (
+                    <span className='bg-yellow-100 px-3 py-1 rounded-full text-xs inline-block text-center '>
+                      Partial (Paid: {currency}{booking.paidAmount},Pending: {currency}{booking.pendingAmount})
+                    </span>
+                  )}
+                  {booking.paymentStatus === 'unpaid' && (
+                    <span className='bg-red-100 px-3 py-1 rounded-full text-xs inline-block text-center'>Unpaid</span>
+                  )}
                 </td>
 
                 <td className='p-3'>

@@ -25,7 +25,7 @@ export const AppProvider = ({children})=>{
         try {
             const { data } = await axios.get('/api/user/data');
         if (data.success) {
-        // 🔒 Blocked user check
+        //  Blocked user check
         if (data.user.isBlocked) {
             toast.error("Your account has been blocked. Logging out...");
             logout(); // logs out and navigates to login

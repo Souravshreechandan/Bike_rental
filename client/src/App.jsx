@@ -15,6 +15,7 @@ import Login from './components/Login';
 import {Toaster} from 'react-hot-toast'
 import { useAppContext } from './context/AppContext';
 import ManageUsers from './pages/owner/ManageUsers';
+import Payment from './pages/Payment';
 
 
 
@@ -35,6 +36,9 @@ const App = () => {
         <Route path="/bike_details/:id" element={<BikeDetails />} />
         <Route path="/bikes" element={<Bikes />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/payment" element={<Payment />} />
+
+         {/* Owner dashboard routes */}
         <Route path="/owner" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="add-bike" element={<AddBike />} />

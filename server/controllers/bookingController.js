@@ -43,7 +43,13 @@ export const checkAvailabilityOfBike = async (req,res)=>{
 export const createBooking= async(req,res)=>{
     try {
         const {_id} =req.user;
-        const{bike,pickupDate,returnDate}=req.body;
+        const{
+            bike,
+            pickupDate,
+            returnDate,
+            paymentMethod = "offline", // default if not provided
+            paidAmount = 0, // amount user pays now
+        }=req.body;
 
         const isAvailable = await checkAvailability(bike,pickupDate,returnDate)
         if(!isAvailable){
@@ -55,21 +61,32 @@ export const createBooking= async(req,res)=>{
         const picked =  new Date(pickupDate);
         const returned = new Date(returnDate);
         const noOfDays = Math.ceil((returned-picked)/(1000*60*60*24))
-        const price = bikeData.pricePerDay * noOfDays;
 
-        await Booking.create(
+        //  UPDATED: calculate totalAmount
+        const totalAmount = bikeData.pricePerDay * noOfDays;
+
+        // Calculate pending amount and status
+        const pendingAmount = totalAmount - paidAmount;
+        const paymentStatus =
+            paidAmount === 0
+                ? "unpaid"
+                : pendingAmount === 0
+                ? "paid"
+                : "partial";
+
+
+        const booking = await Booking.create(
             {
                 bike, 
                 owner: bikeData.owner, 
                 user: _id,
                 pickupDate, 
                 returnDate, 
-                price,
-               // status: "pending",
+                price: totalAmount,paymentMethod,paidAmount,pendingAmount,paymentStatus,
+               
             })
-                // update
 
-        res.json({success: true, message: "Booking Created"})
+        res.json({success: true, message: "Booking Created", booking})
 
     } catch (error) {
         console.log(error.message)
@@ -104,18 +121,20 @@ export const getOwnerBookings = async(req,res)=>{
          // Fetch bookings for this owner and populate properly
 
         const bookings = await Booking.find({owner: req.user._id})
-        
-        // .populate("bike", "brand model image") // ✅ populate bike details
-        // .populate('user','-password')
-        // .sort({createdAt:-1});
 
-        .populate('bike user')
-        .select("-user.password")
+        .populate("bike user","-user.password")
         .sort({createdAt: -1})
+
+        // 🔹 UPDATED: ensure paymentStatus and pendingAmount are sent
+        const formattedBookings = bookings.map(b => ({
+            ...b._doc,
+            paymentStatus: b.paymentStatus || 'unpaid',
+            pendingAmount: b.pendingAmount || b.price
+        }))
         
         console.log('get Owner Bookings:', bookings);
 
-        res.json({success:true,bookings})
+        res.json({success:true, bookings: formattedBookings })
     
     } catch (error) {
         console.log(error.message)

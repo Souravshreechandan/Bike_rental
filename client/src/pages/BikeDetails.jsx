@@ -16,22 +16,45 @@ const BikeDetails = () => {
 
   const handleSubmit = async(e)=>{
     e.preventDefault();
-    try {
-      const {data} = await axios.post('/api/bookings/create', {
-        bike: id,
-        pickupDate,
-        returnDate,
-      })
-      if(data.success){
-        toast.success(data.message)
-        navigate('/my-bookings')
-      }else{
-        toast.error(data.message)
-      }
-    } catch (error) {
-      toast.error(error.message)
+//update for payment
+    if (!pickupDate || !returnDate) {
+      toast.error("Please select pickup and return dates")
+      return
     }
+
+    // Calculate total amount based on selected dates
+    const picked = new Date(pickupDate)
+    const returned = new Date(returnDate)
+    const noOfDays = Math.ceil((returned - picked) / (1000 * 60 * 60 * 24))
+    const totalAmount = bike.pricePerDay * noOfDays
+
+    // Navigate to Payment page with bike info and total amount
+    navigate("/payment", {
+      state: {
+        bike,
+        totalAmount,
+        pickupDate,
+        returnDate
+      }
+    })
   }
+
+  //   try {
+  //     const {data} = await axios.post('/api/bookings/create', {
+  //       bike: id,
+  //       pickupDate,
+  //       returnDate,
+  //     })
+  //     if(data.success){
+  //       toast.success(data.message)
+  //       navigate('/my-bookings')
+  //     }else{
+  //       toast.error(data.message)
+  //     }
+  //   } catch (error) {
+  //     toast.error(error.message)
+  //   }
+  // }
 
   useEffect(()=>{
     setBike(bikes.find(bike => bike._id === id))
@@ -141,7 +164,7 @@ const BikeDetails = () => {
           <button className='w-full bg-primary hover:bg-primary-dull transition-all 
           py-3 font-medium text-white rounded-xl cursor-pointer'>Book Now</button>
 
-          <p className='text-center text-sm'>We also accept credit card</p>
+          <p className='text-center text-sm'>We also accept partial payment</p>
 
         </motion.form>
       </div>
