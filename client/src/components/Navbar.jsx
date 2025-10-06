@@ -62,9 +62,14 @@ const Navbar = () => {
             null
           )}
 
-          <button onClick={() => { user ? logout() : setShowLogin(true)}} className="cursor-pointer px-8 py-2
-           bg-primary hover:bg-primary-dull transition-all text-white rounded-lg">
-            { user ? 'Logout' : 'Login'}</button>
+         
+          <button
+          onClick={() => { user ? logout() : setShowLogin(true) }}
+          className="flex items-center gap-2 px-6 py-2 rounded-lg border border-blue-600
+             text-blue-600 bg-transparent hover:bg-blue-600 hover:text-white
+             transition-all duration-300">
+            {!user && <img src={assets.user_icon} alt="user" className="w-5 h-5" />} 
+            {user ? 'Logout' : 'Login'}</button>
 
         </div>
 

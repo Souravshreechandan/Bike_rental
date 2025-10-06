@@ -11,11 +11,11 @@ const bookingSchema = new mongoose.Schema({
     status: {type: String, enum:["pending","confirmed","cancelled"],default:"pending"},
     price: {type: Number, required:true},
 
-    // 💰 New payment fields
+    //  New payment fields
     paymentMethod: {type: String,enum: ["offline", "online"],default: "offline",},
     paidAmount: { type: Number, default: 0 },
     pendingAmount: { type: Number, default: 0 },
-    paymentStatus: {type: String,enum: ["unpaid", "partial", "complete"],default: "unpaid", },
+    paymentStatus: {type: String,enum: ["unpaid", "partial", "paid"],default: "unpaid", },
 
 }, { timestamps: true });
 

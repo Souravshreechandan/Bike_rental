@@ -8,7 +8,6 @@ const Payment = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
 
-  // 🔹 Destructure pickupDate and returnDate from state
   const { bike, totalAmount, pickupDate, returnDate } = state;
 
   const [paymentMethod, setPaymentMethod] = useState("offline");
@@ -27,7 +26,7 @@ const Payment = () => {
       const paidAmount = paymentMethod === "offline" ? 0 : Number(payNow);
 
       const res = await axios.post("/api/bookings/create", {
-        bike: bike._id,       // 🔹 send only bike ID
+        bike: bike._id,
         pickupDate,
         returnDate,
         paidAmount,
@@ -48,30 +47,35 @@ const Payment = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow mt-10">
-      <h2 className="text-xl font-semibold mb-4">
+    <div className="max-w-lg mx-auto mt-12 p-8 bg-white rounded-3xl shadow-lg border border-gray-200">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">
         Payment for {bike.brand} {bike.model}
       </h2>
 
-      <p className="mb-2">
-        Total Amount: {currency} {totalAmount}
-      </p>
+      <div className="mb-6">
+        <p className="text-gray-600 mb-2">Total Amount:</p>
+        <p className="text-xl font-semibold text-primary">
+          {currency} {totalAmount}
+        </p>
+      </div>
 
-      <div className="my-4">
-        <label className="block mb-1 font-medium">Payment Method</label>
+      <div className="mb-6">
+        <label className="block text-gray-700 font-medium mb-2">
+          Payment Method
+        </label>
         <select
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value)}
-          className="border p-2 rounded w-full"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
         >
-          <option value="offline">Offline</option>
+          <option value="offline">Offline (Cash after ride)</option>
           <option value="online">Online</option>
         </select>
       </div>
 
       {paymentMethod === "online" && (
-        <div className="my-4">
-          <label className="block mb-2 font-medium">
+        <div className="mb-6">
+          <label className="block text-gray-700 font-medium mb-2">
             Pay Now: {currency} {payNow}
           </label>
           <input
@@ -80,16 +84,24 @@ const Payment = () => {
             max={totalAmount}
             value={payNow}
             onChange={(e) => setPayNow(e.target.value)}
-            className="w-full"
+            className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer
+                       accent-blue-500 transition-all hover:scale-y-125"
+            style={{ accentColor: '#3B82F6' }}
           />
+          <div className="flex justify-between text-gray-500 text-xs mt-1">
+            <span>0</span>
+            <span>{totalAmount}</span>
+          </div>
         </div>
       )}
 
       <button
         onClick={handlePayment}
         disabled={loading}
-        className={`w-full py-3 px-4 rounded text-white mt-4 ${
-          loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+        className={`w-full py-3 rounded-full text-white font-medium transition-colors ${
+          loading
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"
         }`}
       >
         {loading ? "Processing..." : "Confirm Booking"}

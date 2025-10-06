@@ -68,8 +68,8 @@ const ManageUsers = () => {
               <th className="p-3 font-medium">Name</th>
               <th className="p-3 font-medium max-md:hidden">Email</th>
               <th className="p-3 font-medium">Role</th>
-              <th className="p-3 font-medium">Status</th>
-              <th className="p-3 font-medium">Actions</th>
+              <th className="p-3 font-medium text-center">Status</th>
+              <th className="p-3 font-medium text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -82,7 +82,8 @@ const ManageUsers = () => {
                     <td className="p-3 font-medium">{user.name}</td>
                     <td className="p-3 max-md:hidden">{user.email}</td>
                     <td className="p-3">{user.role}</td>
-                    <td className="p-3">
+                    <td className="p-3 align-middle text-center">
+
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           user.isBlocked
@@ -93,11 +94,14 @@ const ManageUsers = () => {
                         {user.isBlocked ? "Blocked" : "Active"}
                       </span>
                     </td>
-                    <td className="p-3 flex gap-2">
+                    <td className="p-3">
+                      <div className="flex flex-col md:flex-row justify-center items-center gap-2">
+
+                  
                       {/* Block/Unblock button */}
                       <button
                         onClick={() => handleBlockToggle(user._id)}
-                        className={`px-3 py-1 rounded text-white ${
+                        className={`px-3 py-1 text-white rounded-full ${
                           user.isBlocked
                             ? "bg-green-500 hover:bg-green-600"
                             : "bg-yellow-500 hover:bg-yellow-600"
@@ -109,10 +113,11 @@ const ManageUsers = () => {
                       {/* Delete button */}
                       <button
                         onClick={() => handleDeleteUser(user._id)}
-                        className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded"
+                        className="px-3 py-1  bg-red-500 hover:bg-red-600 text-white rounded-full"
                       >
                         Delete
                       </button>
+                      </div>
                     </td>
                   </tr>
                 ))

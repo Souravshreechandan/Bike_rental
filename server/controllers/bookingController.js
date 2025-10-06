@@ -165,3 +165,35 @@ export const changeBookingStatus= async (req,res)=>{
     }
 }
 
+// API to pay remaining amount
+export const payRemaining = async (req, res) => {
+  try {
+    const { bookingId, amount } = req.body;
+    const booking = await Booking.findById(bookingId);
+
+    if (!booking)
+      return res.json({ success: false, message: "Booking not found" });
+
+    // 🟢 FIX 1: Ensure numeric values before calculations
+    const payment = Number(amount);
+    booking.paidAmount = Number(booking.paidAmount) + payment;
+
+    // 🟢 FIX 2: Recalculate pending amount safely
+    booking.pendingAmount = Number(booking.price) - booking.paidAmount;
+
+    // 🟢 FIX 3: Make sure when fully paid, values are consistent
+    if (booking.paidAmount >= Number(booking.price)) {
+      booking.paymentStatus = "paid";
+      booking.paidAmount = Number(booking.price);
+      booking.pendingAmount = 0; // ✅ force reset
+    } else {
+      booking.paymentStatus = "partial";
+    }
+
+    await booking.save();
+    res.json({ success: true, message: "Payment updated", booking });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
