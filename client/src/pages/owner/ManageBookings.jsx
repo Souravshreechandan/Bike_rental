@@ -55,14 +55,19 @@ const ManageBookings = () => {
               <th className="p-3 font-medium text-center">Bike</th>
               <th className="p-3 font-medium max-md:hidden">Date Range</th>
               <th className="p-3 font-medium">Total</th>
-              <th className="p-3 font-medium max-md:hidden text-center">Payment</th>
+              <th className="p-3 font-medium max-md:hidden text-center">
+                Payment
+              </th>
               <th className="p-3 font-medium text-center">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {bookings.map((booking, index) => (
-              <tr key={index} className="border-t border-borderColor text-gray-500">
+              <tr
+                key={index}
+                className="border-t border-borderColor text-gray-500"
+              >
                 <td className="p-3">{index + 1}</td>
 
                 <td className="p-3 flex items-center gap-3">
@@ -77,7 +82,8 @@ const ManageBookings = () => {
                 </td>
 
                 <td className="p-3 max-md:hidden">
-                  {booking.pickupDate.split('T')[0]} to {booking.returnDate.split('T')[0]}
+                  {booking.pickupDate.split("T")[0]} to{" "}
+                  {booking.returnDate.split("T")[0]}
                 </td>
 
                 <td className="p-3">
@@ -86,13 +92,13 @@ const ManageBookings = () => {
                 </td>
 
                 <td className="p-3 max-md:hidden text-center">
-                  {booking.paymentStatus === 'paid' && (
+                  {booking.paymentStatus === "paid" && (
                     <span className="bg-green-100 text-green-500 font-semibold px-3 py-1 rounded-full text-xs inline-block text-center">
                       Paid
                     </span>
                   )}
 
-                  {booking.paymentStatus === 'partial' && (
+                  {booking.paymentStatus === "partial" && (
                     <span className="bg-yellow-100 text-gray-500 font-semibold px-3 py-1 rounded-full text-xs inline-block text-center">
                       Partially Paid: {currency}
                       {booking.paidAmount} <br />
@@ -101,17 +107,26 @@ const ManageBookings = () => {
                     </span>
                   )}
 
-                  {booking.paymentStatus === 'unpaid' && (
+                  {booking.paymentStatus === "unpaid" && (
                     <span className="bg-red-100 text-red-500 font-semibold px-3 py-1 rounded-full text-xs inline-block text-center">
                       Unpaid
+                    </span>
+                  )}
+
+                  {/* NEW: Handle refunded status */}
+                  {booking.paymentStatus === "refunded" && (
+                    <span className="bg-blue-100 text-blue-500 font-semibold px-3 py-1 rounded-full text-xs inline-block text-center">
+                      Refunded
                     </span>
                   )}
                 </td>
 
                 <td className="p-3 text-center">
-                  {booking.status === 'pending' ? (
+                  {booking.status === "pending" ? (
                     <select
-                      onChange={(e) => changeBookingStatus(booking._id, e.target.value)}
+                      onChange={(e) =>
+                        changeBookingStatus(booking._id, e.target.value)
+                      }
                       value={booking.status}
                       className="px-2 py-1.5 mt-1 text-gray-500 border border-borderColor rounded-md outline-none"
                     >
@@ -122,9 +137,9 @@ const ManageBookings = () => {
                   ) : (
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        booking.status === 'confirmed'
-                          ? 'bg-green-100 text-green-500'
-                          : 'bg-red-100 text-red-500'
+                        booking.status === "confirmed"
+                          ? "bg-green-100 text-green-500"
+                          : "bg-red-100 text-red-500"
                       }`}
                     >
                       {booking.status}

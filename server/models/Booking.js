@@ -15,7 +15,7 @@ const bookingSchema = new mongoose.Schema({
     paymentMethod: {type: String,enum: ["offline", "online"],default: "offline",},
     paidAmount: { type: Number, default: 0 },
     pendingAmount: { type: Number, default: 0 },
-    paymentStatus: {type: String,enum: ["unpaid", "partial", "paid"],default: "unpaid", },
+    paymentStatus: {type: String,enum: ["unpaid", "partial", "paid","refunded"],default: "unpaid", },
 
 }, { timestamps: true });
 
