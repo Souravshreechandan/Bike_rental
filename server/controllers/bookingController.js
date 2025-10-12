@@ -151,10 +151,28 @@ export const changeBookingStatus= async (req,res)=>{
 
         const booking = await Booking.findById(bookingId)
 
-        if(booking.owner.toString() !== _id.toString()){
-            return res.json({success:false, message:"Unauthorized"})
-        }
-        booking.status = status;
+        // if(booking.owner.toString() !== _id.toString()){
+        //     return res.json({success:false, message:"Unauthorized"})
+        // }
+        // booking.status = status;
+        if (!booking) {
+      return res.json({ success: false, message: "Booking not found" });
+    }
+
+    // Check if the logged-in user is the owner
+    if (booking.owner.toString() !== _id.toString()) {
+      return res.json({ success: false, message: "Unauthorized" });
+    }
+
+    booking.status = status;
+
+    // If owner cancels, refund the payment
+    if (status.toLowerCase() === "cancelled") {
+      if (booking.paymentStatus === "paid" || booking.paymentStatus === "partial") {
+        booking.paymentStatus = "refunded";
+        booking.pendingAmount = 0 //  set pending to 0 when refunded
+      }
+    }
         await booking.save();
 
         res.json({success:true, message:"Status updated"})
@@ -168,29 +186,38 @@ export const changeBookingStatus= async (req,res)=>{
 // API to pay remaining amount
 export const payRemaining = async (req, res) => {
   try {
-    const { bookingId, amount } = req.body;
+    const { bookingId, amount, razorpayPaymentId } = req.body;
+
+    if (!bookingId || !amount) {
+      return res.json({ success: false, message: "Booking ID and amount are required" });
+    }
+
     const booking = await Booking.findById(bookingId);
-
-    if (!booking)
+    if (!booking) {
       return res.json({ success: false, message: "Booking not found" });
+    }
 
-    // 🟢 FIX 1: Ensure numeric values before calculations
+    // Ensure numeric values
     const payment = Number(amount);
     booking.paidAmount = Number(booking.paidAmount) + payment;
-
-    // 🟢 FIX 2: Recalculate pending amount safely
     booking.pendingAmount = Number(booking.price) - booking.paidAmount;
 
-    // 🟢 FIX 3: Make sure when fully paid, values are consistent
+    // Store Razorpay payment ID if available
+    if (razorpayPaymentId) {
+      booking.razorpayPaymentId = razorpayPaymentId;
+    }
+
+    // Update payment status
     if (booking.paidAmount >= Number(booking.price)) {
       booking.paymentStatus = "paid";
       booking.paidAmount = Number(booking.price);
-      booking.pendingAmount = 0; // ✅ force reset
+      booking.pendingAmount = 0;
     } else {
       booking.paymentStatus = "partial";
     }
 
     await booking.save();
+
     res.json({ success: true, message: "Payment updated", booking });
   } catch (error) {
     console.log(error);

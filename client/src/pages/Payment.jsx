@@ -23,24 +23,73 @@ const Payment = () => {
     setLoading(true);
 
     try {
-      const paidAmount = paymentMethod === "offline" ? 0 : Number(payNow);
+      if (paymentMethod === "offline") {
+        // Offline booking
+        const res = await axios.post("/api/bookings/create", {
+          bike: bike._id,
+          pickupDate,
+          returnDate,
+          paidAmount: 0,
+          paymentMethod,
+        });
 
-      const res = await axios.post("/api/bookings/create", {
-        bike: bike._id,
-        pickupDate,
-        returnDate,
-        paidAmount,
-        paymentMethod,
-      });
-
-      if (res.data.success) {
-        toast.success("Booking successful!");
-        navigate("/my-bookings");
+        if (res.data.success) {
+          toast.success("Booking successful!");
+          navigate("/my-bookings");
+        } else {
+          toast.error(res.data.message || "Booking failed!");
+        }
       } else {
-        toast.error(res.data.message || "Booking failed!");
+        // Online payment using Razorpay
+
+        // 1️⃣ Create Razorpay order from backend
+        const orderRes = await axios.post("http://localhost:3000/api/payment/create-order", {
+          amount: payNow, // amount in INR
+        });
+
+        const orderData = orderRes.data;
+
+        // 2️⃣ Configure Razorpay checkout
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Replace with your Razorpay test key
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: "Bike Booking",
+          description: `Payment for ${bike.brand} ${bike.model}`,
+          order_id: orderData.id,
+          handler: async function (response) {
+            // 3️⃣ After payment success, create booking in backend
+            const bookingRes = await axios.post("/api/bookings/create", {
+              bike: bike._id,
+              pickupDate,
+              returnDate,
+              paidAmount: payNow,
+              paymentMethod: "online",
+            });
+
+            if (bookingRes.data.success) {
+              toast.success("Booking successful!");
+              navigate("/my-bookings");
+            } else {
+              toast.error(bookingRes.data.message || "Booking failed!");
+            }
+          },
+          prefill: {
+            name: "Test User",
+            email: "test@example.com",
+            contact: "9999999999",
+          },
+          theme: {
+            color: "#3B82F6",
+          },
+        };
+
+        // 4️⃣ Open Razorpay checkout
+        const rzp = new window.Razorpay(options);
+        rzp.open();
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message || "Booking failed!");
+      toast.error(err.response?.data?.message || err.message || "Payment failed!");
     } finally {
       setLoading(false);
     }
@@ -83,10 +132,10 @@ const Payment = () => {
             min="0"
             max={totalAmount}
             value={payNow}
-            onChange={(e) => setPayNow(e.target.value)}
+            onChange={(e) => setPayNow(Number(e.target.value))}
             className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer
                        accent-blue-500 transition-all hover:scale-y-125"
-            style={{ accentColor: '#3B82F6' }}
+            style={{ accentColor: "#3B82F6" }}
           />
           <div className="flex justify-between text-gray-500 text-xs mt-1">
             <span>0</span>
