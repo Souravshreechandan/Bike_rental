@@ -2,9 +2,7 @@ import mongoose from 'mongoose';
 import Bike from "../models/Bike.js";
 import Booking from "../models/Booking.js"
 
-
-
-// function to check availability of car for a given place
+// function to check availability of bikes for a given place
 const checkAvailability = async (bike,pickupDate,returnDate)=>{
     const bookings = await Booking.find({
         bike,
