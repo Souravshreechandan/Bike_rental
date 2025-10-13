@@ -16,11 +16,7 @@ await connectDB()
 
 // middleware
 app.use(
-    cors({
-        origin: ["https://bike-rental-mu.vercel.app"],
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        credentials: true,
-    })
+    cors()
 );
 app.use (express.json());
 
