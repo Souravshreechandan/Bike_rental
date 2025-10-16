@@ -1,44 +1,39 @@
 import imagekit from "../configs/imageKit.js";
 import Bike from "../models/Bike.js";
 import Booking from "../models/Booking.js";
+import Hub from "../models/Hub.js";
 import User from "../models/User.js";
-import fs from 'fs'
+import fs from "fs";
 
-// Get all registered users (for admin/owner panel)
+// ------------------- USER MANAGEMENT -------------------
+
 export const getAllUsers = async (req, res) => {
   try {
-     // Only get users where role = "user"
-    const users = await User.find({ role: "user" }).select("-password"); // don't send password
-
-    res.json({success: true, users});
+    const users = await User.find({ role: "user" }).select("-password");
+    res.json({ success: true, users });
   } catch (error) {
     console.error("Error fetching users:", error);
-    res.json({ success: false, message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-//api to change role of user
-export const changeRoleToOwner = async(req,res)=>{
-    try {
-        const{_id}= req.user;
-        await User.findByIdAndUpdate(_id,{role:"owner"})
-        res.json({success:true, message:"Now you can list Bike"})
-    } catch (error) {
-        console.log(error.message);
-        res.json({success:false,message:error.message})
-    }
-}
+export const changeRoleToOwner = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    await User.findByIdAndUpdate(_id, { role: "owner" });
+    res.json({ success: true, message: "Now you can list Bikes" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
-// Toggle block user
 export const toggleBlockUser = async (req, res) => {
   try {
     const { userId } = req.params;
-
     const user = await User.findById(userId);
-
-    if (!user) {
+    if (!user)
       return res.status(404).json({ success: false, message: "User not found" });
-    }
 
     user.isBlocked = !user.isBlocked;
     await user.save();
@@ -53,15 +48,12 @@ export const toggleBlockUser = async (req, res) => {
   }
 };
 
-// Delete user
 export const deleteUser = async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await User.findByIdAndDelete(userId);
-
-    if (!user) {
+    if (!user)
       return res.status(404).json({ success: false, message: "User not found" });
-    }
 
     res.json({ success: true, message: "User deleted successfully" });
   } catch (err) {
@@ -69,173 +61,219 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+// ------------------- BIKE MANAGEMENT -------------------
 
+export const addBike = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    let bike = JSON.parse(req.body.bikeData);
+    const imageFile = req.file;
 
-//api to list Bike
-export const addBike = async(req,res)=>{
-    try {
-        const {_id} = req.user
-        let bike = JSON.parse(req.body.bikeData);
-        const imageFile = req.file;
+    const fileBuffer = fs.readFileSync(imageFile.path);
+    const response = await imagekit.upload({
+      file: fileBuffer,
+      fileName: imageFile.originalname,
+      folder: "/bikes",
+    });
 
-        //upload image to imagekit
-        const fileBuffer = fs.readFileSync(imageFile.path)
-        const response = await imagekit.upload({
-            file: fileBuffer,
-            fileName: imageFile.originalname,
-            folder:"/bikes"
-        })
+    const optimizedImageUrl = imagekit.url({
+      path: response.filePath,
+      transformation: [{ width: "1280" }, { quality: "auto" }, { format: "webp" }],
+    });
 
-        // optimization through imagekit URL transformation 
-        var optimizedImageUrl = imagekit.url({
-            path : response.filePath,
-            transformation : [
-                {width: '1280'}, //width resizing
-                {quality: 'auto'}, // auto compression
-                {format: 'webp'} //convert to mordern format
-            ]
-        });
+    const image = optimizedImageUrl;
+    await Bike.create({ ...bike, owner: _id, image });
 
-        const image = optimizedImageUrl;
-        await Bike.create({...bike, owner: _id, image})
-
-        res.json({success: true, message: 'Bike Added'})
-
-        
-    } catch (error) {
-        console.log(error.message)
-        res.json({success:false, message: error.message})
-    }
-}
-
-//api to list owner bikes
-export const getOwnerBikes = async(req,res)=>{
-    try {
-        const{_id} = req.user;
-        const bikes = await Bike.find({owner: _id})
-        res.json({ success: true, bikes }); 
-    } catch (error) {
-        console.log(error.message)
-        res.json({success: false, message: error.message})
-    }
-}
-
-//api to toggle bike availability
-export const toggleBikeAvailability= async(req,res)=>{
-    try {
-        const {_id} = req.user;
-        const {bikeId}= req.body
-        const bike = await Bike.findById(bikeId)
-
-        //checking is bike belongs to he user
-        if(bike.owner.toString() !== _id.toString()){
-            return res.json({success:false,message:"Unauthorized"})
-        }
-        bike.isAvailable = !bike.isAvailable
-        await bike.save()
-
-        res.json({success:true,message:'Availability Toggled'})
-    } catch (error) {
-        console.log(error.message)
-        res.json({success: false, message: error.message})
-    }
-}
-
-//api to delete bike 
-export const deleteBike= async(req,res)=>{
-    try {
-        const{_id} = req.user;
-        const {bikeId}= req.body
-        const bike = await Bike.findById(bikeId)
-
-        //checking is bike belongs to he user
-        if(bike.owner.toString() !== _id.toString()){
-            return res.json({success:false,message:"Unauthorized"})
-        }
-        bike.owner = null
-        bike.isAvailable = false
-        await bike.save()
-
-        res.json({success:true,message:'Bike Removed'})
-    } catch (error) {
-        console.log(error.message)
-        res.json({success: false, message: error.message})
-    }
-}
-
-//api to get dashboard data
-export const getDashboardData = async (req,res)=>{
-    try {
-        const { _id, role}= req.user
-
-        if(role !== 'owner'){
-            return res.json({success:false,message: "Unauthorized"})
-        }
-        const bikes = await Bike.find({owner: _id})
-        const bookings = await Booking.find({owner: _id})
-        .populate('bike')
-        .sort({createdAt: -1});
-
-        const pendingBookings = await Booking.find({owner: _id, status:"pending"})
-        const completedBookings = await Booking.find({owner: _id, status:"confirmed"})
-
-        //calculate monthly revenue from bookings where status is confirmed
-
-        const monthlyRevenue = bookings.slice()
-        .filter(booking => booking.status === 'confirmed')
-        .reduce((acc, booking)=> acc + booking.price, 0)
-
-        const dashboardData = {
-            
-            totalBikes: bikes.length,
-            totalBookings: bookings.length,
-            pendingBookings: pendingBookings.length,
-            completedBookings: completedBookings.length,
-            recentBookings: bookings.slice(0,3),
-            monthlyRevenue
-        }
-
-        res.json({success:true, dashboardData});
-
-    } catch (error) {
-        console.log(error.message)
-        res.json({success:false, message:error.message})
-    }
-}
-
-//Api to update user image
-
-export const updateUserImage = async(req,res)=>{
-    try {
-        const{_id} = req.user;
-         const imageFile = req.file;
-
-        //upload image to imagekit
-        const fileBuffer = fs.readFileSync(imageFile.path)
-        const response = await imagekit.upload({
-            file: fileBuffer,
-            fileName: imageFile.originalname,
-            folder:"/users"
-        })
-
-        // optimization through imagekit URL transformation 
-        var optimizedImageUrl = imagekit.url({
-            path : response.filePath,
-            transformation : [
-                {width: '1280'}, //width resizing
-                {quality: 'auto'}, // auto compression
-                {format: 'webp'} //convert to mordern format
-            ]
-        });
-
-        const image = optimizedImageUrl;
-
-        await User.findByIdAndUpdate(_id,{image});
-        res.json({success:true,message:"Image Updated"})
-        
-    } catch (error) {
-        console.log(error.message);
-        res.json({success:false, message:error.message})
-    }
+    res.json({ success: true, message: "Bike Added" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
+export const getOwnerBikes = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const bikes = await Bike.find({ owner: _id });
+    res.json({ success: true, bikes });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const toggleBikeAvailability = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const { bikeId } = req.body;
+    const bike = await Bike.findById(bikeId);
+
+    if (!bike || bike.owner.toString() !== _id.toString()) {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
+    }
+
+    bike.isAvailable = !bike.isAvailable;
+    await bike.save();
+
+    res.json({ success: true, message: "Availability Toggled" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const deleteBike = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const { bikeId } = req.body;
+    const bike = await Bike.findById(bikeId);
+
+    if (!bike || bike.owner.toString() !== _id.toString()) {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
+    }
+
+    bike.owner = null;
+    bike.isAvailable = false;
+    await bike.save();
+
+    res.json({ success: true, message: "Bike Removed" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ------------------- DASHBOARD -------------------
+
+export const getDashboardData = async (req, res) => {
+  try {
+    const { _id, role } = req.user;
+    if (role !== "owner")
+      return res.status(403).json({ success: false, message: "Unauthorized" });
+
+    const bikes = await Bike.find({ owner: _id });
+    const bookings = await Booking.find({ owner: _id })
+      .populate("bike")
+      .sort({ createdAt: -1 });
+    const pendingBookings = bookings.filter((b) => b.status === "pending");
+    const completedBookings = bookings.filter((b) => b.status === "confirmed");
+
+    const monthlyRevenue = completedBookings.reduce((acc, b) => acc + b.price, 0);
+
+    res.json({
+      success: true,
+      dashboardData: {
+        totalBikes: bikes.length,
+        totalBookings: bookings.length,
+        pendingBookings: pendingBookings.length,
+        completedBookings: completedBookings.length,
+        recentBookings: bookings.slice(0, 3),
+        monthlyRevenue,
+      },
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ------------------- USER IMAGE UPDATE -------------------
+
+export const updateUserImage = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const imageFile = req.file;
+    const fileBuffer = fs.readFileSync(imageFile.path);
+    const response = await imagekit.upload({
+      file: fileBuffer,
+      fileName: imageFile.originalname,
+      folder: "/users",
+    });
+
+    const optimizedImageUrl = imagekit.url({
+      path: response.filePath,
+      transformation: [{ width: "1280" }, { quality: "auto" }, { format: "webp" }],
+    });
+
+    await User.findByIdAndUpdate(_id, { image: optimizedImageUrl });
+    res.json({ success: true, message: "Image Updated" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ------------------- HUB MANAGEMENT -------------------
+
+// Get all hubs
+export const getAllHubs = async (req, res) => {
+  try {
+    const hubs = await Hub.find().populate("owner", "name email");
+    res.json({ success: true, hubs });
+  } catch (err) {
+    console.error("Error fetching all hubs:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Get hub by ID
+export const getHubById = async (req, res) => {
+  try {
+    const { hubId } = req.params;
+    const hub = await Hub.findById(hubId).populate("owner", "name email");
+    if (!hub) return res.status(404).json({ success: false, message: "Hub not found" });
+    res.json({ success: true, hub });
+  } catch (err) {
+    console.error("Error fetching hub by ID:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Create hub
+export const createHub = async (req, res) => {
+  try {
+    const ownerId = req.user?._id; // <-- Ensure owner is defined
+    if (!ownerId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const hub = new Hub({
+      ...req.body,
+      owner: ownerId, // attach logged-in owner
+    });
+
+    await hub.save();
+    res.json({ success: true, message: "Hub created successfully!", hub });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// Update hub
+export const updateHub = async (req, res) => {
+  try {
+    const { hubId } = req.params;
+    const updates = req.body;
+    const hub = await Hub.findByIdAndUpdate(hubId, updates, { new: true });
+    if (!hub) return res.status(404).json({ success: false, message: "Hub not found" });
+
+    res.json({ success: true, message: "Hub updated successfully!", hub });
+  } catch (err) {
+    console.error("Error updating hub:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Delete hub
+export const deleteHub = async (req, res) => {
+  try {
+    const { hubId } = req.params;
+    const hub = await Hub.findByIdAndDelete(hubId);
+    if (!hub) return res.status(404).json({ success: false, message: "Hub not found" });
+    res.json({ success: true, message: "Hub deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting hub:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

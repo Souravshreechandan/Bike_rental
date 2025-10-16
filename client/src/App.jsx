@@ -16,6 +16,7 @@ import {Toaster} from 'react-hot-toast'
 import { useAppContext } from './context/AppContext';
 import ManageUsers from './pages/owner/ManageUsers';
 import Payment from './pages/Payment';
+import HubSettings from './pages/owner/HubSettings';
 
 
 
@@ -45,6 +46,7 @@ const App = () => {
           <Route path="manage-bikes" element={<ManageBikes />} />
           <Route path="manage-bookings" element={<ManageBookings />} />
           <Route path="manage-users" element={<ManageUsers />} />
+          <Route path="hub-details" element={<HubSettings/>} />
         </Route>
       </Routes>
 

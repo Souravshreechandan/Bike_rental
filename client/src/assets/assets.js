@@ -101,7 +101,9 @@ export const ownerMenuLinks = [
     { name: "Add bikes", path: "/owner/add-bike", icon: addIcon, coloredIcon: addIconColored },
     { name: "Manage bikes", path: "/owner/manage-bikes", icon: carIcon, coloredIcon: bikeIconColored },
     { name: "Manage Bookings", path: "/owner/manage-bookings", icon: listIcon, coloredIcon: listIconColored },
-    { name: "Manage Users", path: "/owner/manage-users", icon: users_icon, coloredIcon: listIconColored } /* user data to see in owner page*/
+    { name: "Manage Users", path: "/owner/manage-users", icon: users_icon, coloredIcon: listIconColored }, /* user data to see in owner page*/
+    { name: "Hub Details", path: "/owner/hub-details", icon: listIcon, coloredIcon: listIconColored },
+
 ]
 
 export const dummyUserData = {
