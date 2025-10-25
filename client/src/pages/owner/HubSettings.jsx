@@ -77,7 +77,6 @@ const HubSettings = () => {
     }
   };
 
-  // ✅ Fixed handleAdd function
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!selectedHub) return;
@@ -89,7 +88,7 @@ const HubSettings = () => {
 
       const { data } = await axios.post("/api/hubs", payload, {
         headers: {
-          authorization: token, // middleware reads this
+          authorization: token,
           "Content-Type": "application/json",
         },
       });
@@ -136,7 +135,7 @@ const HubSettings = () => {
               });
               setIsAdding(true);
             }}
-            className="px-4 py-2 bg-green-500 text-white rounded"
+            className="px-3 py-1 text-white rounded-full bg-green-500 hover:bg-green-600"
           >
             Add Hub
           </button>
@@ -153,31 +152,25 @@ const HubSettings = () => {
               className="flex flex-col gap-3"
               onSubmit={isAdding ? handleAdd : handleUpdate}
             >
-              {[
-                "name",
-                "address",
-                "city",
-                "state",
-                "pincode",
-                "phone",
-                "email",
-              ].map((field) => (
-                <label key={field} className="flex flex-col">
-                  {field.charAt(0).toUpperCase() + field.slice(1)}
-                  <input
-                    type={field === "email" ? "email" : "text"}
-                    value={selectedHub[field] || ""}
-                    onChange={(e) =>
-                      setSelectedHub({ ...selectedHub, [field]: e.target.value })
-                    }
-                    placeholder={`Enter ${field}`}
-                    className="px-3 py-2 border rounded outline-none w-full"
-                    required={["name", "address", "city", "state", "pincode"].includes(
-                      field
-                    )}
-                  />
-                </label>
-              ))}
+              {["name", "address", "city", "state", "pincode", "phone", "email"].map(
+                (field) => (
+                  <label key={field} className="flex flex-col">
+                    {field.charAt(0).toUpperCase() + field.slice(1)}
+                    <input
+                      type={field === "email" ? "email" : "text"}
+                      value={selectedHub[field] || ""}
+                      onChange={(e) =>
+                        setSelectedHub({ ...selectedHub, [field]: e.target.value })
+                      }
+                      placeholder={`Enter ${field}`}
+                      className="px-3 py-2 border rounded outline-none w-full"
+                      required={["name", "address", "city", "state", "pincode"].includes(
+                        field
+                      )}
+                    />
+                  </label>
+                )
+              )}
 
               <label className="flex flex-col">
                 Capacity
@@ -237,7 +230,7 @@ const HubSettings = () => {
               <div className="flex gap-2 mt-2">
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-primary text-white rounded"
+                  className="px-3 py-1 text-white rounded-full bg-primary hover:bg-primary-dark"
                   disabled={isLoading}
                 >
                   {isLoading
@@ -250,7 +243,7 @@ const HubSettings = () => {
                 </button>
                 <button
                   type="button"
-                  className="px-4 py-2 bg-gray-300 rounded"
+                  className="px-3 py-1 text-white rounded-full bg-gray-300 hover:bg-gray-400"
                   onClick={handleCancel}
                 >
                   Cancel
@@ -266,6 +259,7 @@ const HubSettings = () => {
                   <th className="p-3 font-medium">Sl.No</th>
                   <th className="p-3 font-medium">Hub Name</th>
                   <th className="p-3 font-medium">Email</th>
+                  <th className="p-3 font-medium">Status</th>
                   <th className="p-3 font-medium text-center">Actions</th>
                 </tr>
               </thead>
@@ -279,25 +273,38 @@ const HubSettings = () => {
                       <td className="p-3">{index + 1}</td>
                       <td className="p-3">{hub.name}</td>
                       <td className="p-3">{hub.email || "-"}</td>
-                      <td className="p-3 text-center flex gap-2 justify-center">
-                        <button
-                          onClick={() => handleEdit(hub)}
-                          className="px-3 py-1 bg-blue-500 text-white rounded-md"
+                      <td className="p-3">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            hub.status === "active"
+                              ? "bg-green-100 text-green-600"
+                              : "bg-red-100 text-red-600"
+                          }`}
                         >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(hub._id)}
-                          className="px-3 py-1 bg-red-500 text-white rounded-md"
-                        >
-                          Delete
-                        </button>
+                          {hub.status === "active" ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td className="p-3 text-center">
+                        <div className="flex flex-col md:flex-row justify-center items-center gap-2">
+                          <button
+                            onClick={() => handleEdit(hub)}
+                            className="px-3 py-1 text-white rounded-full bg-blue-500 hover:bg-blue-600"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(hub._id)}
+                            className="px-3 py-1 text-white rounded-full bg-red-500 hover:bg-red-600"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4" className="p-4 text-center text-gray-500">
+                    <td colSpan="5" className="p-4 text-center text-gray-500">
                       No hubs found
                     </td>
                   </tr>

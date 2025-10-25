@@ -152,9 +152,18 @@ const MyBookings = () => {
                 <img src={assets.location_icon_colored} alt="" className="w-4 h-4" />
                 <div>
                   <p className="text-gray-500">Pick-up Location</p>
-                  <p>{booking.bike.location}</p>
+                  {/* Show hub name below location */}
+                {booking.hub && (
+                <>
+                  <p className="text-sm mt-1">
+                    Hub: <span className="font-semibold">{booking.hub.name}</span>
+                  </p>
+                   
+                  </> 
+                  )}
                 </div>
               </div>
+
             </div>
 
             {/* Price + Payment Info */}

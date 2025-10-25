@@ -6,7 +6,8 @@ updateHub,
 getAllHubs,
 getHubById,
 deleteHub,
-createHub} from "../controllers/ownerController.js";
+createHub,
+updateBike} from "../controllers/ownerController.js";
 import upload from "../middleware/multer.js";
 
 const ownerRouter = express.Router();
@@ -17,6 +18,8 @@ ownerRouter.post("/add-bike", upload.single("image"),protect,addBike)
 ownerRouter.get("/bikes",protect,getOwnerBikes)
 ownerRouter.post("/toggle-bike",protect,toggleBikeAvailability)
 ownerRouter.post("/delete-bike",protect,deleteBike)
+ownerRouter.put("/bikes/:bikeId", protect, upload.single("image"), updateBike);
+
 
 // Dashboard
 ownerRouter.get('/dashboard', protect, getDashboardData)

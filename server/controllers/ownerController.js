@@ -143,6 +143,54 @@ export const deleteBike = async (req, res) => {
   }
 };
 
+// ------------------- UPDATE BIKE -------------------
+
+export const updateBike = async (req, res) => {
+  try {
+    const { bikeId } = req.params;
+    const { brand, model, pricePerDay, category, transmission, fuelType } = req.body;
+
+    const bike = await Bike.findById(bikeId);
+    if (!bike) return res.status(404).json({ success: false, message: "Bike not found" });
+
+    // Only owner can update
+    if (bike.owner.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
+    }
+
+    // Update bike fields
+    bike.brand = brand;
+    bike.model = model;
+    bike.pricePerDay = pricePerDay;
+    bike.category = category;
+    bike.transmission = transmission;
+    bike.fuelType = fuelType;
+
+    // Update image if provided
+    if (req.file) {
+      const fileBuffer = fs.readFileSync(req.file.path);
+      const response = await imagekit.upload({
+        file: fileBuffer,
+        fileName: req.file.originalname,
+        folder: "/bikes",
+      });
+
+      const optimizedImageUrl = imagekit.url({
+        path: response.filePath,
+        transformation: [{ width: "1280" }, { quality: "auto" }, { format: "webp" }],
+      });
+
+      bike.image = optimizedImageUrl;
+    }
+
+    await bike.save();
+    res.json({ success: true, message: "Bike updated successfully", bike });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // ------------------- DASHBOARD -------------------
 
 export const getDashboardData = async (req, res) => {
@@ -205,7 +253,6 @@ export const updateUserImage = async (req, res) => {
 
 // ------------------- HUB MANAGEMENT -------------------
 
-// Get all hubs
 export const getAllHubs = async (req, res) => {
   try {
     const hubs = await Hub.find().populate("owner", "name email");
@@ -216,7 +263,6 @@ export const getAllHubs = async (req, res) => {
   }
 };
 
-// Get hub by ID
 export const getHubById = async (req, res) => {
   try {
     const { hubId } = req.params;
@@ -229,17 +275,16 @@ export const getHubById = async (req, res) => {
   }
 };
 
-// Create hub
 export const createHub = async (req, res) => {
   try {
-    const ownerId = req.user?._id; // <-- Ensure owner is defined
+    const ownerId = req.user?._id;
     if (!ownerId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
     const hub = new Hub({
       ...req.body,
-      owner: ownerId, // attach logged-in owner
+      owner: ownerId,
     });
 
     await hub.save();
@@ -250,7 +295,6 @@ export const createHub = async (req, res) => {
   }
 };
 
-// Update hub
 export const updateHub = async (req, res) => {
   try {
     const { hubId } = req.params;
@@ -265,7 +309,6 @@ export const updateHub = async (req, res) => {
   }
 };
 
-// Delete hub
 export const deleteHub = async (req, res) => {
   try {
     const { hubId } = req.params;

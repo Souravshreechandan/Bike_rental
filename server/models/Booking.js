@@ -22,6 +22,11 @@ const bookingSchema = new mongoose.Schema({
     paymentStatus: {type: String,
         enum: ["unpaid", "partial", "paid","refunded"],
         default: "unpaid", },
+    
+    address: { type: String },
+    phone: { type: String },
+    hub: { type: mongoose.Schema.Types.ObjectId, ref: "Hub" },
+    pickupLocation: { type: String },
 
 }, { timestamps: true });
 

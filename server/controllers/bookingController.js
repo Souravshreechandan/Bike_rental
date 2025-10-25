@@ -49,6 +49,10 @@ export const createBooking= async(req,res)=>{
             returnDate,
             paymentMethod = "offline", // default if not provided
             paidAmount = 0, // amount user pays now
+            address,          
+            phone,            
+            hubId,            
+            pickupLocation,
         }=req.body;
 
         const isAvailable = await checkAvailability(bike,pickupDate,returnDate)
@@ -82,7 +86,15 @@ export const createBooking= async(req,res)=>{
                 user: _id,
                 pickupDate, 
                 returnDate, 
-                price: totalAmount,paymentMethod,paidAmount,pendingAmount,paymentStatus,
+                price: totalAmount,
+                  paidAmount,
+                  pendingAmount,
+                  paymentStatus,
+                  paymentMethod,
+                address,
+                phone,
+                hub: hubId,
+                pickupLocation,  
                
             })
 
@@ -101,6 +113,7 @@ export const getUserBookings = async (req,res)=>{
       const { _id } = req.user;
       const bookings = await Booking.find({user: _id})
       .populate("bike")
+      .populate("hub") //
       .sort({createdAt:-1})
        console.log('user Bookings:', bookings);
       res.json({success:true,bookings})

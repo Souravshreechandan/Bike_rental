@@ -8,7 +8,8 @@ const Payment = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
 
-  const { bike, totalAmount, pickupDate, returnDate } = state;
+  // Destructure all fields from state
+  const { bike, totalAmount, pickupDate, returnDate, address, phone, hub } = state;
 
   const [paymentMethod, setPaymentMethod] = useState("offline");
   const [payNow, setPayNow] = useState(0);
@@ -17,6 +18,11 @@ const Payment = () => {
   const handlePayment = async () => {
     if (!pickupDate || !returnDate) {
       toast.error("Please select pickup and return dates.");
+      return;
+    }
+
+    if (!address || !phone || !hub) {
+      toast.error("Please provide address, phone, and select hub.");
       return;
     }
 
@@ -31,6 +37,9 @@ const Payment = () => {
           returnDate,
           paidAmount: 0,
           paymentMethod,
+          address,
+          phone,
+          hubId: hub, // match backend field
         });
 
         if (res.data.success) {
@@ -41,30 +50,26 @@ const Payment = () => {
         }
       } else {
         // Online payment using Razorpay
-
-        // 1️⃣ Create Razorpay order from backend
-        const orderRes = await axios.post("http://localhost:3000/api/payment/create-order", {
-          amount: payNow, // amount in INR
-        });
-
+        const orderRes = await axios.post("/api/payment/create-order", { amount: payNow });
         const orderData = orderRes.data;
 
-        // 2️⃣ Configure Razorpay checkout
         const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Replace with your Razorpay test key
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
           amount: orderData.amount,
           currency: orderData.currency,
           name: "Bike Booking",
           description: `Payment for ${bike.brand} ${bike.model}`,
           order_id: orderData.id,
           handler: async function (response) {
-            // 3️⃣ After payment success, create booking in backend
             const bookingRes = await axios.post("/api/bookings/create", {
               bike: bike._id,
               pickupDate,
               returnDate,
               paidAmount: payNow,
               paymentMethod: "online",
+              address,
+              phone,
+              hubId: hub,
             });
 
             if (bookingRes.data.success) {
@@ -79,12 +84,9 @@ const Payment = () => {
             email: "test@example.com",
             contact: "9999999999",
           },
-          theme: {
-            color: "#3B82F6",
-          },
+          theme: { color: "#3B82F6" },
         };
 
-        // 4️⃣ Open Razorpay checkout
         const rzp = new window.Razorpay(options);
         rzp.open();
       }
@@ -103,15 +105,11 @@ const Payment = () => {
 
       <div className="mb-6">
         <p className="text-gray-600 mb-2">Total Amount:</p>
-        <p className="text-xl font-semibold text-primary">
-          {currency} {totalAmount}
-        </p>
+        <p className="text-xl font-semibold text-primary">{currency} {totalAmount}</p>
       </div>
 
       <div className="mb-6">
-        <label className="block text-gray-700 font-medium mb-2">
-          Payment Method
-        </label>
+        <label className="block text-gray-700 font-medium mb-2">Payment Method</label>
         <select
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value)}
@@ -148,9 +146,7 @@ const Payment = () => {
         onClick={handlePayment}
         disabled={loading}
         className={`w-full py-3 rounded-full text-white font-medium transition-colors ${
-          loading
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700"
+          loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
         }`}
       >
         {loading ? "Processing..." : "Confirm Booking"}
