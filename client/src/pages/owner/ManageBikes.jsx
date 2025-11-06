@@ -138,7 +138,6 @@ const ManageBikes = () => {
                   <option value="Petrol">Petrol</option>
                   <option value="Diesel">Diesel</option>
                   <option value="EV">EV</option>
-                  <option value="Hybrid">Hybrid</option>
                 </select>
               </label>
 

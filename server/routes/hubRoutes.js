@@ -1,12 +1,7 @@
 import express from "express";
 import { protect } from "../middleware/auth.js";
-import {
-  getAllHubs,
-  getHubById,
-  updateHub,
-  deleteHub,
-  createHub,
-} from "../controllers/ownerController.js";
+import {getAllHubs,getHubById,updateHub,deleteHub,createHub,}
+ from "../controllers/ownerController.js";
 
 const hubRouter = express.Router();
 

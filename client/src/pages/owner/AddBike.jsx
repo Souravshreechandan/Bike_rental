@@ -120,7 +120,7 @@ const AddBike = () => {
                                 value={bike.category}
                                 className='px-3 py-2 mt-1 border border-borderColor rounded-md outline-none'>
                                 <option value="">Select a category</option>
-                                <option value="OIL">OIL</option>
+                                <option value="OIL">FUEL</option>
                                 <option value="EV">EV</option>
                             </select>
                         </div>
@@ -145,10 +145,9 @@ const AddBike = () => {
                                 value={bike.fuel_type}
                                 className='px-3 py-2 mt-1 border border-borderColor rounded-md outline-none'>
                                 <option value="">Select fuel type</option>
-                                <option value="Gas">Gas</option>
-                                <option value="Diesel">Diesel</option>
                                 <option value="Petrol">Petrol</option>
-                                <option value="Electric">Electric</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Electric">EV</option>
                             </select>
                         </div>
 
