@@ -40,6 +40,16 @@ const ManageBookings = () => {
     fetchOwnerBookings();
   }, []);
 
+  // Format date helper
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+    return new Date(date).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
   return (
     <div className="px-4 pt-10 md:px-10 w-full">
       <Title
@@ -53,7 +63,9 @@ const ManageBookings = () => {
             <tr>
               <th className="p-3 font-medium">Sl.No</th>
               <th className="p-3 font-medium text-center">Bike</th>
-              <th className="p-3 font-medium max-md:hidden">Date Range</th>
+              <th className="p-3 font-medium max-md:hidden">
+                Date & Time Slot
+              </th>
               <th className="p-3 font-medium">Total</th>
               <th className="p-3 font-medium max-md:hidden text-center">
                 Payment
@@ -65,7 +77,7 @@ const ManageBookings = () => {
           <tbody>
             {bookings.map((booking, index) => (
               <tr
-                key={index}
+                key={booking._id}
                 className="border-t border-borderColor text-gray-500"
               >
                 <td className="p-3">{index + 1}</td>
@@ -81,9 +93,37 @@ const ManageBookings = () => {
                   </p>
                 </td>
 
+                {/* 🔥 UPDATED: Date + Slot + Duration */}
                 <td className="p-3 max-md:hidden">
-                  {booking.pickupDate.split("T")[0]} to{" "}
-                  {booking.returnDate.split("T")[0]}
+                  <div className="flex flex-col">
+                    <span className="font-medium text-gray-700">
+                      {formatDate(booking.pickupDate)}
+                      {booking.pickupSlot && (
+                        <span className="ml-1 text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
+                          {booking.pickupSlot}
+                        </span>
+                      )}
+                    </span>
+
+                    <span className="text-xs text-gray-400 my-1">to</span>
+
+                    <span className="font-medium text-gray-700">
+                      {formatDate(booking.returnDate)}
+                      {booking.returnSlot && (
+                        <span className="ml-1 text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">
+                          {booking.returnSlot}
+                        </span>
+                      )}
+                    </span>
+
+                    {/* Show total hours if exists */}
+                    {booking.totalHours && (
+                      <span className="text-xs text-primary font-semibold mt-1">
+                        Duration: {booking.totalHours} hour
+                        {booking.totalHours > 1 ? "s" : ""}
+                      </span>
+                    )}
+                  </div>
                 </td>
 
                 <td className="p-3">
@@ -113,7 +153,6 @@ const ManageBookings = () => {
                     </span>
                   )}
 
-                  {/* NEW: Handle refunded status */}
                   {booking.paymentStatus === "refunded" && (
                     <span className="bg-blue-100 text-blue-500 font-semibold px-3 py-1 rounded-full text-xs inline-block text-center">
                       Refunded

@@ -1,3 +1,5 @@
+
+
 import React, { useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import Title from "../components/Title";
@@ -9,15 +11,32 @@ const MyBookings = () => {
   const { axios, user, currency } = useAppContext();
   const [bookings, setBookings] = useState([]);
   const [expandedHub, setExpandedHub] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Format date (DD MMM YYYY)
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+    return new Date(date).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   // Fetch user's bookings
   const fetchMyBookings = async () => {
     try {
+      setLoading(true);
       const { data } = await axios.get("/api/bookings/user");
-      if (data.success) setBookings(data.bookings);
-      else toast.error(data.message);
+      if (data.success) {
+        setBookings(data.bookings || []);
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to fetch bookings");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,8 +82,8 @@ const MyBookings = () => {
           }
         },
         prefill: {
-          name: user?.name || "Test User",
-          email: user?.email || "test@example.com",
+          name: user?.name || "User",
+          email: user?.email || "user@example.com",
           contact: user?.phone || "9999999999",
         },
         theme: { color: "#3B82F6" },
@@ -97,30 +116,42 @@ const MyBookings = () => {
         align="left"
       />
 
+      {/* Loading State */}
+      {loading && (
+        <p className="text-center mt-12 text-gray-500">Loading bookings...</p>
+      )}
+
+      {/* Empty State */}
+      {!loading && bookings.length === 0 && (
+        <p className="text-center mt-12 text-gray-500 text-lg">
+          No bookings found.
+        </p>
+      )}
+
       <div>
         {bookings.map((booking, index) => (
           <motion.div
             key={booking._id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.4 }}
+            transition={{ delay: index * 0.08, duration: 0.4 }}
             className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 border border-borderColor rounded-lg mt-5 first:mt-12"
           >
             {/* Bike Image + Info */}
             <div className="md:col-span-1">
               <div className="rounded-md overflow-hidden mb-3">
                 <img
-                  src={booking.bike.image}
-                  alt={`${booking.bike.brand} ${booking.bike.model}`}
+                  src={booking?.bike?.image}
+                  alt={`${booking?.bike?.brand} ${booking?.bike?.model}`}
                   className="w-full h-auto aspect-video object-cover"
                 />
               </div>
               <p className="text-lg font-medium mt-2">
-                {booking.bike.brand} {booking.bike.model}
+                {booking?.bike?.brand} {booking?.bike?.model}
               </p>
               <p className="text-gray-500">
-                {booking.bike.year} • {booking.bike.category} •{" "}
-                {booking.bike.location}
+                {booking?.bike?.year} • {booking?.bike?.category} •{" "}
+                {booking?.bike?.location}
               </p>
             </div>
 
@@ -131,7 +162,7 @@ const MyBookings = () => {
                   Booking #{index + 1}
                 </p>
                 <p
-                  className={`px-3 py-1 text-xs rounded-full ${
+                  className={`px-3 py-1 text-xs rounded-full capitalize ${
                     booking.status === "confirmed"
                       ? "bg-green-400/15 text-green-600"
                       : "bg-red-400/15 text-red-600"
@@ -141,38 +172,51 @@ const MyBookings = () => {
                 </p>
               </div>
 
-              <div className="flex items-start gap-2 mt-3">
+              {/* Rental Period with Time Slots */}
+              <div className="flex items-start gap-2 mt-4">
                 <img
                   src={assets.calendar_icon_colored}
                   alt=""
-                  className="w-4 h-4"
+                  className="w-4 h-4 mt-1"
                 />
                 <div>
                   <p className="text-gray-500">Rental Period</p>
-                  <p>
-                    {booking.pickupDate.split("T")[0]} To{" "}
-                    {booking.returnDate.split("T")[0]}
+
+                  <p className="font-medium">
+                    {formatDate(booking.pickupDate)}{" "}
+                    {booking.pickupSlot && `(${booking.pickupSlot})`}
                   </p>
+
+                  <p className="font-medium">
+                    To {formatDate(booking.returnDate)}{" "}
+                    {booking.returnSlot && `(${booking.returnSlot})`}
+                  </p>
+
+                  {booking.totalHours && (
+                    <p className="text-xs text-primary font-semibold mt-1">
+                      Duration: {booking.totalHours} hour
+                      {booking.totalHours > 1 ? "s" : ""}
+                    </p>
+                  )}
                 </div>
               </div>
 
-              <div className="flex items-start gap-2 mt-3">
+              {/* Hub Info */}
+              <div className="flex items-start gap-2 mt-4">
                 <img
                   src={assets.location_icon_colored}
                   alt=""
-                  className="w-4 h-4"
+                  className="w-4 h-4 mt-1"
                 />
                 <div>
                   <p className="text-gray-500">Pick-up Location</p>
 
-                  {/* Hub Info */}
                   {booking.hub && (
                     <>
                       <p className="text-sm mt-1 font-semibold">
                         Hub: {booking.hub.name}
                       </p>
 
-                      {/* 👇 View Details Button */}
                       <button
                         onClick={() => toggleHubDetails(booking._id)}
                         className="mt-2 text-blue-500 underline text-sm"
@@ -182,7 +226,6 @@ const MyBookings = () => {
                           : "View Details"}
                       </button>
 
-                      {/* 👇 Hub Details Collapsible Section */}
                       {expandedHub === booking._id && (
                         <div className="mt-3 p-3 border border-gray-200 rounded-lg bg-gray-50 text-sm space-y-1">
                           <p><strong>Address:</strong> {booking.hub.address}</p>
@@ -206,32 +249,40 @@ const MyBookings = () => {
               <div className="text-sm text-gray-500">
                 <p>Total Price</p>
                 <h1 className="text-2xl font-semibold text-primary">
-                  {currency}
-                  {booking.price}
+                  {currency}{booking.price}
                 </h1>
-                <p>Booked on {booking.createdAt.split("T")[0]}</p>
+
+                {/* Hour-wise breakdown */}
+                {booking.totalHours && booking?.bike?.pricePerDay && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    {currency}{booking.bike.pricePerDay} × {booking.totalHours} hrs
+                  </p>
+                )}
+
+                <p className="mt-2">
+                  Booked on {formatDate(booking.createdAt)}
+                </p>
               </div>
 
               {/* Payment Status Section */}
-              <div className="mt-4 flex flex-col items-end gap-1">
+              <div className="mt-4 flex flex-col items-end gap-2">
                 {booking.paymentStatus === "paid" && (
                   <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-semibold">
-                    Paid: {currency}
-                    {booking.paidAmount}
+                    Paid: {currency}{booking.paidAmount}
                   </span>
                 )}
 
                 {booking.paymentStatus === "partial" && (
-                  <div className="flex flex-col items-end gap-1">
+                  <div className="flex flex-col items-end gap-2">
                     <span className="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-sm font-semibold">
-                      Partially Paid: {currency}
-                      {booking.paidAmount}
+                      Partially Paid: {currency}{booking.paidAmount}
                     </span>
+
                     <div className="flex items-center gap-2">
                       <span className="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
-                        Remaining: {currency}
-                        {booking.pendingAmount}
+                        Remaining: {currency}{booking.pendingAmount}
                       </span>
+
                       {booking.paymentMethod === "online" && (
                         <button
                           className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-sm transition-all"
@@ -258,15 +309,14 @@ const MyBookings = () => {
                     ) : (
                       <div className="flex items-center gap-2">
                         <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-semibold">
-                          Unpaid: {currency}
-                          {booking.pendingAmount}
+                          Unpaid: {currency}{booking.pendingAmount}
                         </span>
                         <button
                           className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-sm transition-all"
                           onClick={() =>
                             handlePayRemaining(
                               booking._id,
-                              booking.pendingAmount
+                              Number(booking.pendingAmount)
                             )
                           }
                         >
@@ -279,8 +329,7 @@ const MyBookings = () => {
 
                 {booking.paymentStatus === "refunded" && (
                   <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-semibold">
-                    Refunded: {currency}
-                    {booking.paidAmount}
+                    Refunded: {currency}{booking.paidAmount}
                   </span>
                 )}
               </div>

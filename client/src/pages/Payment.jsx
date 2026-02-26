@@ -8,16 +8,25 @@ const Payment = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
 
-  // Destructure all fields from state
-  const { bike, totalAmount, pickupDate, returnDate, address, phone, hub } = state;
+  const {
+    bike,
+    totalAmount,
+    pickupDate,
+    returnDate,
+    pickupSlot,   
+    returnSlot,   
+    address,
+    phone,
+    hub,
+  } = state || {};
 
   const [paymentMethod, setPaymentMethod] = useState("offline");
   const [payNow, setPayNow] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const handlePayment = async () => {
-    if (!pickupDate || !returnDate) {
-      toast.error("Please select pickup and return dates.");
+    if (!pickupDate || !returnDate || !pickupSlot || !returnSlot) {
+      toast.error("Missing booking time slot details.");
       return;
     }
 
@@ -29,17 +38,23 @@ const Payment = () => {
     setLoading(true);
 
     try {
+      const bookingPayload = {
+        bike: bike._id,
+        pickupDate,
+        returnDate,
+        pickupSlot,   
+        returnSlot,   
+        paymentMethod,
+        address,
+        phone,
+        hubId: hub,
+      };
+
       if (paymentMethod === "offline") {
         // Offline booking
         const res = await axios.post("/api/bookings/create", {
-          bike: bike._id,
-          pickupDate,
-          returnDate,
+          ...bookingPayload,
           paidAmount: 0,
-          paymentMethod,
-          address,
-          phone,
-          hubId: hub, // match backend field
         });
 
         if (res.data.success) {
@@ -49,8 +64,11 @@ const Payment = () => {
           toast.error(res.data.message || "Booking failed!");
         }
       } else {
-        // Online payment using Razorpay
-        const orderRes = await axios.post("/api/payment/create-order", { amount: payNow });
+        // Online payment (Razorpay)
+        const orderRes = await axios.post("/api/payment/create-order", {
+          amount: payNow,
+        });
+
         const orderData = orderRes.data;
 
         const options = {
@@ -60,29 +78,26 @@ const Payment = () => {
           name: "Bike Booking",
           description: `Payment for ${bike.brand} ${bike.model}`,
           order_id: orderData.id,
-          handler: async function (response) {
+          handler: async function () {
             const bookingRes = await axios.post("/api/bookings/create", {
-              bike: bike._id,
-              pickupDate,
-              returnDate,
+              ...bookingPayload,
               paidAmount: payNow,
               paymentMethod: "online",
-              address,
-              phone,
-              hubId: hub,
             });
 
             if (bookingRes.data.success) {
               toast.success("Booking successful!");
               navigate("/my-bookings");
             } else {
-              toast.error(bookingRes.data.message || "Booking failed!");
+              toast.error(
+                bookingRes.data.message || "Booking failed!"
+              );
             }
           },
           prefill: {
-            name: "Test User",
-            email: "test@example.com",
-            contact: "9999999999",
+            name: "User",
+            email: "user@example.com",
+            contact: phone || "9999999999",
           },
           theme: { color: "#3B82F6" },
         };
@@ -91,11 +106,23 @@ const Payment = () => {
         rzp.open();
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message || "Payment failed!");
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Payment failed!"
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  if (!bike) {
+    return (
+      <div className="text-center mt-20 text-gray-500">
+        Invalid booking session. Please book again.
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-lg mx-auto mt-12 p-8 bg-white rounded-3xl shadow-lg border border-gray-200">
@@ -103,17 +130,31 @@ const Payment = () => {
         Payment for {bike.brand} {bike.model}
       </h2>
 
-      <div className="mb-6">
-        <p className="text-gray-600 mb-2">Total Amount:</p>
-        <p className="text-xl font-semibold text-primary">{currency} {totalAmount}</p>
+      {/* Booking Summary */}
+      <div className="mb-6 space-y-1 text-sm text-gray-600">
+        <p>
+          Pickup: {pickupDate} ({pickupSlot})
+        </p>
+        <p>
+          Return: {returnDate} ({returnSlot})
+        </p>
       </div>
 
       <div className="mb-6">
-        <label className="block text-gray-700 font-medium mb-2">Payment Method</label>
+        <p className="text-gray-600 mb-2">Total Amount:</p>
+        <p className="text-xl font-semibold text-primary">
+          {currency} {totalAmount}
+        </p>
+      </div>
+
+      <div className="mb-6">
+        <label className="block text-gray-700 font-medium mb-2">
+          Payment Method
+        </label>
         <select
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2"
         >
           <option value="offline">Offline (Cash after ride)</option>
           <option value="online">Online</option>
@@ -131,9 +172,7 @@ const Payment = () => {
             max={totalAmount}
             value={payNow}
             onChange={(e) => setPayNow(Number(e.target.value))}
-            className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer
-                       accent-blue-500 transition-all hover:scale-y-125"
-            style={{ accentColor: "#3B82F6" }}
+            className="w-full"
           />
           <div className="flex justify-between text-gray-500 text-xs mt-1">
             <span>0</span>
@@ -145,8 +184,10 @@ const Payment = () => {
       <button
         onClick={handlePayment}
         disabled={loading}
-        className={`w-full py-3 rounded-full text-white font-medium transition-colors ${
-          loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+        className={`w-full py-3 rounded-full text-white font-medium ${
+          loading
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"
         }`}
       >
         {loading ? "Processing..." : "Confirm Booking"}
