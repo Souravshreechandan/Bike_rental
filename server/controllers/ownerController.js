@@ -201,7 +201,8 @@ export const getDashboardData = async (req, res) => {
 
     const bikes = await Bike.find({ owner: _id });
     const bookings = await Booking.find({ owner: _id })
-      .populate("bike")
+      .populate("bike", "brand model")
+      .populate("user", "name email")// for user details like name and email
       .sort({ createdAt: -1 });
     const pendingBookings = bookings.filter((b) => b.status === "pending");
     const completedBookings = bookings.filter((b) => b.status === "confirmed");
