@@ -1,112 +1,201 @@
-import React from 'react';
-import { useAppContext } from '../context/AppContext';
-import toast from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { useAppContext } from "../context/AppContext";
 
 const Login = () => {
+  const { setShowLogin, axios, setToken, navigate } = useAppContext();
 
-  const {setShowLogin, axios, setToken, navigate}= useAppContext()
+  const [state, setState] = useState("login"); // login | register
 
-  const [state, setState] = React.useState("login");
-  const [name, setName] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // 🔒 Disable background scroll when modal opens
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
+  // LOGIN / REGISTER
   const onSubmitHandler = async (event) => {
     try {
       event.preventDefault();
-      const {data} = await axios.post(`/api/user/${state}`,{name, email, password})
+      setError("");
 
-      if (data.success) {
-        navigate('/')
-        setToken(data.token)
-        localStorage.setItem('token', data.token)
-        setShowLogin(false)
-      } else {
-        toast.error(data.message)
+      if (state === "register" && password !== confirmPassword) {
+        return setError("Passwords do not match");
       }
 
+      setLoading(true);
+      const { data } = await axios.post(`/api/user/${state}`, {
+        name,
+        email,
+        password,
+      });
+      setLoading(false);
+
+      if (data.success) {
+        setToken(data.token);
+        localStorage.setItem("token", data.token);
+        setShowLogin(false);
+        navigate("/");
+      } else {
+        setError(data.message || "Something went wrong");
+      }
     } catch (error) {
-      toast.error(error.message)     
+      setLoading(false);
+      setError(error.message || "Server error");
     }
-    
-  }
+  };
+
+  const getTitle = () => {
+    return state === "login" ? "Welcome Back" : "Create Account";
+  };
+
+  const handleClose = () => {
+    setShowLogin(false);
+  };
 
   return (
     <div
-      onClick={() => setShowLogin(false)}
-      className="fixed top-0 bottom-0 left-0 right-0 z-100 flex items-center text-sm text-gray-600 bg-black/50"
+      onClick={handleClose}
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
     >
       <form
-        onSubmit={onSubmitHandler}
         onClick={(e) => e.stopPropagation()}
-        className="flex flex-col gap-4 m-auto items-start p-8 py-12 w-80 sm:w-[352px] text-gray-500 rounded-lg shadow-xl border border-gray-200 bg-white"
+        onSubmit={onSubmitHandler}
+        className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 space-y-5"
       >
-        <p className="text-2xl font-medium m-auto">
-          <span className="text-primary">User</span> {state === "login" ? "Login" : "Sign Up"}
-        </p>
+        {/* HEADER */}
+        <div className="text-center space-y-1">
+          <h2 className="text-2xl font-bold text-gray-800">{getTitle()}</h2>
+          <p className="text-sm text-gray-500">
+            Login to continue to your account
+          </p>
+        </div>
 
+        {/* ERROR MESSAGE */}
+        {error && (
+          <div className="w-full bg-red-50 border border-red-200 text-red-600 text-sm px-3 py-2 rounded-lg text-center">
+            {error}
+          </div>
+        )}
+
+        {/* NAME (REGISTER) */}
         {state === "register" && (
-          <div className="w-full">
-            <p>Name</p>
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">
+              Full Name
+            </label>
             <input
-              onChange={(e) => setName(e.target.value)}
-              value={name}
-              placeholder="Enter Your Name"
-              className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
               type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setError("");
+              }}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none transition"
               required
             />
           </div>
         )}
 
-        <div className="w-full">
-          <p>Email</p>
+        {/* EMAIL */}
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">
+            Email Address
+          </label>
           <input
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-            placeholder="Enter Your Email"
-            className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
             type="email"
+            placeholder="example@gmail.com"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError("");
+            }}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none transition"
             required
           />
         </div>
 
-        <div className="w-full">
-          <p>Password</p>
+        {/* PASSWORD */}
+        <div className="space-y-1 relative">
+          <label className="text-sm font-medium text-gray-700">
+            Password
+          </label>
           <input
-            onChange={(e) => setPassword(e.target.value)}
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter your password"
             value={password}
-            placeholder="Enter Your Password"
-            className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary"
-            type="password"
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setError("");
+            }}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-12 focus:ring-2 focus:ring-primary outline-none transition"
             required
           />
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-9 text-xs cursor-pointer text-primary font-medium select-none"
+          >
+            {showPassword ? "Hide" : "Show"}
+          </span>
         </div>
 
-        {state === "register" ? (
-          <p>
-            Already have account?{" "}
-            <span
-              onClick={() => setState("login")}
-              className="text-primary cursor-pointer"
-            >
-              click here
-            </span>
-          </p>
-        ) : (
-          <p>
-            Create an account?{" "}
-            <span
-              onClick={() => setState("register")}
-              className="text-primary cursor-pointer"
-            >
-              click here
-            </span>
-          </p>
+        {/* CONFIRM PASSWORD (REGISTER) */}
+        {state === "register" && (
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              placeholder="Confirm password"
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                setError("");
+              }}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary outline-none transition"
+              required
+            />
+          </div>
         )}
 
-        <button className="bg-primary hover:bg-blue-800 transition-all text-white w-full py-2 rounded-md cursor-pointer">
-          {state === "register" ? "Create Account" : "Login"}
+        {/* SWITCH LOGIN / REGISTER */}
+        <p className="text-sm text-center text-gray-600">
+          {state === "login"
+            ? "Don't have an account?"
+            : "Already have an account?"}{" "}
+          <span
+            onClick={() => {
+              setState(state === "login" ? "register" : "login");
+              setError("");
+            }}
+            className="text-primary font-semibold cursor-pointer hover:underline"
+          >
+            {state === "login" ? "Sign Up" : "Login"}
+          </span>
+        </p>
+
+        {/* BUTTON */}
+        <button
+          disabled={loading}
+          className="w-full bg-primary hover:bg-blue-700 text-white py-2.5 rounded-lg font-semibold transition disabled:opacity-50"
+        >
+          {loading
+            ? "Please wait..."
+            : state === "login"
+            ? "Login"
+            : "Create Account"}
         </button>
       </form>
     </div>

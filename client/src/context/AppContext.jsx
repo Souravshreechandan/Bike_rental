@@ -40,11 +40,11 @@ export const AppProvider = ({children})=>{
         if (data.user.role === 'owner') {
             navigate('/owner');
         } else {
-            navigate('/'); // normal user goes to homepage
+            navigate('/');
         }
 
         } else {
-        navigate('/'); // fallback if not success
+        navigate('/'); 
         }
 
     } catch (error) {

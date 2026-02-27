@@ -15,17 +15,29 @@ const generateTokan = (userId)=>{
 export const registerUser = async(req,res)=>{
     try {
         const{ name,email,password} = req.body
-        if(!name || !email || !password  || password.length <8){
+        if(!name || !email || !password ){
             return res.json({success:false, message:'fill all the fields'})
         }
+
+        // password must be 8
+        if (password.length < 8) {
+            return res.json({
+                success: false,
+                message: "Password must be at least 8 characters"});
+        }
+
+        // check user aleardy exits or not
         const userExists=await User.findOne({email})
         if(userExists){
             return res.json({success:false, message:'User aleardy exists'})
         } 
+
+        // hash password
         const hashedPassword = await bcrypt.hash(password, 10)
         const user = await User.create ({name,email,password: hashedPassword})
         const token = generateTokan(user._id.toString())
         res.json({success:true, token})
+
     } catch (error) {
         console.log(error.message);
         res.json({success:false, message: error.message})
@@ -42,7 +54,7 @@ export const loginUser = async (req,res)=>{
             return res.json ({success: false, message: "User not found"})
         }
 
-         // 🔒 Blocked user check
+         // Blocked user check
         if (user.isBlocked) {
         return res.json({ success: false, message: "Your account has been blocked. Contact admin." });
         }
@@ -58,7 +70,7 @@ export const loginUser = async (req,res)=>{
             _id: user._id,
             name: user.name,
             email: user.email,
-            role: user.role,   //  Add this
+            role: user.role,  
             }
         });
     } catch (error) {
