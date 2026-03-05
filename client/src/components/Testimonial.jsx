@@ -5,17 +5,17 @@ import {motion} from 'motion/react'
 
 const Testimonial = () => {
       const testimonials = [
-        {name: "Emma Rodriguez", 
-        location: "Dhenkanal", 
+        {name: "Saroj", 
+        location: "Bhubaneswar", 
         image: assets.testimonial_image_1 ,  
         testimonial: "i have rented bikes from various companies, but  the experience with bikerental was exceptional" },
 
-        {name: "John Smith", 
+        {name: "Soumya", 
         location: "Cuttack", 
-        image: assets.testimonial_image_2 ,  
+        image: assets.testimonial_image_1 ,  
         testimonial: "BikeRental made my trip so much easier. the bike was delivered right to my door,and the customer service was fantastic!" },
 
-        {name: "Ava Johnson", 
+        {name: "Srikant", 
         location: "Bhubaneswar", 
         image:assets.testimonial_image_1 ,
         testimonial: "Fantastic experience! From start to finish, the team was professional, responsive, and genuinely cared about delivering great results." }
