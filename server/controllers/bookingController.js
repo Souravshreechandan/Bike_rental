@@ -4,7 +4,7 @@ import Booking from "../models/Booking.js";
 
 const getHourFromSlot = (slot) => {
   if (!slot) return 0;
-  return parseInt(slot.split(":")[0]);
+  return parseInt(slot);
 };
 
 const getDateTime = (date, slot) => {
@@ -57,6 +57,7 @@ const checkAvailability = async (
 
 export const getBookedSlots = async (req, res) => {
   try {
+
     const { bikeId, date } = req.body;
 
     if (!bikeId || !date) {
@@ -66,31 +67,146 @@ export const getBookedSlots = async (req, res) => {
       });
     }
 
-    const startOfDay = new Date(date);
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
-
     const bookings = await Booking.find({
       bike: bikeId,
-      pickupDate: { $lte: endOfDay },
-      returnDate: { $gte: startOfDay },
       status: { $in: ["pending", "confirmed"] },
     });
 
     const bookedSlots = [];
 
     bookings.forEach((booking) => {
-      if (booking.pickupSlot) bookedSlots.push(booking.pickupSlot);
-      if (booking.returnSlot) bookedSlots.push(booking.returnSlot);
+
+      if (!booking.pickupSlot || !booking.returnSlot) return;
+
+      const bookingPickupDate =
+        booking.pickupDate.toISOString().split("T")[0];
+
+      const bookingReturnDate =
+        booking.returnDate.toISOString().split("T")[0];
+
+      // Same day booking
+      if (
+        bookingPickupDate === bookingReturnDate &&
+        date === bookingPickupDate
+      ) {
+
+        const slotOrder = [
+          "10:00",
+          "11:00",
+          "12:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+          "18:00",
+        ];
+
+        const pickupIndex =
+          slotOrder.indexOf(booking.pickupSlot);
+
+        const returnIndex =
+          slotOrder.indexOf(booking.returnSlot);
+
+        for (
+          let i = pickupIndex;
+          i <= returnIndex;
+          i++
+        ) {
+          bookedSlots.push(slotOrder[i]);
+        }
+      }
+
+      // Pickup day
+      else if (date === bookingPickupDate) {
+
+        const slotOrder = [
+          "10:00",
+          "11:00",
+          "12:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+          "18:00",
+        ];
+        const pickupIndex =
+          slotOrder.indexOf(booking.pickupSlot);
+
+        for (
+          let i = pickupIndex;
+          i < slotOrder.length;
+          i++
+        ) {
+          bookedSlots.push(slotOrder[i]);
+        }
+      }
+
+      // Return day
+      else if (date === bookingReturnDate) {
+        const slotOrder = [
+          "10:00",
+          "11:00",
+          "12:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+          "18:00",
+        ];
+
+        const returnIndex =
+          slotOrder.indexOf(booking.returnSlot);
+
+        // Block slots BEFORE return slot
+        for (
+          let i = 0;
+          i < returnIndex;
+          i++
+        ) {
+          bookedSlots.push(slotOrder[i]);
+        }
+      }
+
+      // Middle dates fully blocked
+      else if (
+        date > bookingPickupDate &&
+        date < bookingReturnDate
+      ) {
+
+        bookedSlots.push(
+          "10:00",
+          "11:00",
+          "12:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+          "18:00"
+        );
+      }
+
     });
 
     res.json({
       success: true,
-      bookedSlots,
+      bookedSlots: [...new Set(bookedSlots)],
     });
+
   } catch (error) {
-    console.log("getBookedSlots Error:", error.message);
-    res.json({ success: false, message: error.message });
+
+    console.log(
+      "getBookedSlots Error:",
+      error.message
+    );
+
+    res.json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 

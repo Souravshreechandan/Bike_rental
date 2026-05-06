@@ -3,58 +3,106 @@ import Title from './Title'
 import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import BikeCard from './BikeCard'
-import {motion} from 'motion/react'
+import { motion } from 'motion/react'
 import { useAppContext } from '../context/AppContext'
 
-
 const FeaturedSection = () => {
-    const navigate =useNavigate()
-    const {bikes} = useAppContext()
-  return (
-    <motion.div 
-    initial = {{opacity: 0, y: 40}}
-    whileInView={{opacity: 1, y: 0}}
-    transition={{duration: 1, ease:"easeOut"}}
-    className='flex flex-col items-center py-24 px-6 md:px-16 lg:px-24 xl:gap-x-32'>
 
-      <motion.div
-        initial = {{opacity: 0, y: 20}}
-        whileInView={{opacity: 1, y: 0}}
-        transition={{duration: 1, delay: 0.5}}
-      >  
-        <Title title='Featured Vehicles'subTitle='Explore our selection of premium available
-        available for your next adventure.'/>
-      </motion.div>
-      <motion.div 
-        initial = {{opacity: 0, y: 100}}
-        whileInView={{opacity: 1, y: 0}}
-        transition={{delay:0.5, duration: 1}}
-      className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-18'>
-        {
-            bikes.slice(0,6).map((bike)=>(
-                <motion.div key={bike._id}
-                initial = {{opacity: 0, scale: 0.95}}
-                whileInView={{opacity: 1, scale: 1}}
-                transition={{duration: 0.4, ease:"easeOut"}}
+    const navigate = useNavigate()
+    const { bikes } = useAppContext()
+
+    return (
+
+        <section className='bg-[#f5f7fb] px-6 md:px-16 lg:px-24 py-12'>
+
+            {/* Header */}
+            <div className='flex items-center justify-between mb-8 flex-wrap gap-4'>
+
+                <div>
+
+                    <p
+                        className='text-blue-600 uppercase
+                        text-sm font-semibold tracking-wider
+                        mb-3'
+                    >
+                        Popular Bikes
+                    </p>
+
+                    <Title
+                        title='Top Picks for Your Next Adventure'
+                        subTitle=''
+                    />
+
+                </div>
+
+                {/* View All */}
+                <button
+
+                    onClick={() => {
+                        navigate('/bikes')
+                        scrollTo(0, 0)
+                    }}
+
+                    className='hidden md:flex items-center gap-2
+                    text-blue-600 font-medium hover:gap-3
+                    transition-all'
                 >
-                    <BikeCard bike={bike}/>
-                </motion.div>
-            ))
-        }
-      </motion.div>
-      <motion.button 
-      initial = {{opacity: 0, y: 40}}
-      whileInView={{opacity: 1, y: 0}}
-      transition={{delay:0.6, duration: 0.4}}
-      onClick={()=>{navigate('/bike'); scrollTo(0,0)
 
-      }}
-      className='flex items-center justify-center gap-2 px-6 py-2 border 
-      border-borderColor hover:bg-gray-50 rounded-md mt-18 cursor-pointer'>
-        Explore all Bikes <img src={assets.arrow_icon} alt="arrow" />
-      </motion.button>
-    </motion.div>
-  )
+                    View all bikes
+
+                    <img
+                        src={assets.arrow_icon}
+                        alt="arrow"
+                        className='w-4'
+                    />
+
+                </button>
+
+            </div>
+
+            {/* Cards */}
+            <motion.div
+
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+
+                transition={{
+                    duration: 0.7
+                }}
+
+                className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'
+            >
+
+                {bikes.slice(0, 3).map((bike) => (
+
+                    <motion.div
+
+                        key={bike._id}
+
+                        whileHover={{
+                            y: -8
+                        }}
+
+                        transition={{
+                            duration: 0.3
+                        }}
+
+                        className='bg-white rounded-[24px]
+                        overflow-hidden border border-gray-100
+                        shadow-sm hover:shadow-xl
+                        transition-all duration-300'
+                    >
+
+                        <BikeCard bike={bike} />
+
+                    </motion.div>
+
+                ))}
+
+            </motion.div>
+
+        </section>
+    )
 }
 
 export default FeaturedSection

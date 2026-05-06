@@ -1,31 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { data, Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { assets, menuLinks } from '../assets/assets';
-import { motion } from 'motion/react';
 import { useAppContext } from '../context/AppContext';
-import toast from 'react-hot-toast';
 
 const Navbar = () => {
 
-  const { setShowLogin, user, logout, isOwner, axios, setIsOwner } = useAppContext();
-
   const location = useLocation();
+
   const [open, setOpen] = useState(false);
   const [time, setTime] = useState(new Date());
-  const navigate = useNavigate();
 
-  // Stable live clock
+  const { setShowLogin, user, logout } = useAppContext();
+
+  // Live Clock
   useEffect(() => {
+
     const timer = setInterval(() => {
       setTime(new Date());
     }, 1000);
+
     return () => clearInterval(timer);
+
   }, []);
 
-  // Show only first name 
-  const firstName = user?.name ? user.name.split(' ')[0] : '';
+  const isHome = location.pathname === '/';
 
-  // Fixed width time format
+  const textColor = isHome
+    ? 'text-white'
+    : 'text-black';
+
+  const subText = isHome
+    ? 'text-gray-300'
+    : 'text-gray-500';
+
+  // Time
   const formattedTime = time.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
@@ -37,122 +47,196 @@ const Navbar = () => {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
-  });
-
-  const formattedDay = time.toLocaleDateString('en-IN', {
     weekday: 'short',
   });
 
-  const changeRole = async () => {
-    try {
-      const { data } = await axios.post('/api/owner/change-role');
-      if (data.success) {
-        setIsOwner(true);
-        toast.success(data.message);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
-
   return (
-    <motion.div
-      initial={{ y: -20, opacity: 0 }}
+
+    <motion.nav
+      initial={{ y: -30, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className={`flex items-center px-4 sm:px-6 md:px-16 lg:px-24 xl:px-32 py-4 text-gray-600 border-b border-borderColor relative transition-all ${location.pathname === '/' && 'bg-light'}`}
+      className={`w-full z-50 transition-all duration-300
+      ${
+        isHome
+          ? 'absolute top-0 left-0 bg-transparent'
+          : 'sticky top-0 bg-white shadow-md'
+      }`}
     >
 
-      {/* LEFT: Logo */}
-      <div className="flex-shrink-0">
-        <Link to="/">
-          <motion.img
-            whileHover={{ scale: 1.05 }}
+      <div className="flex items-center justify-between px-6 md:px-16 lg:px-24 py-5">
+
+        {/* Logo */}
+        <Link to="/" className="flex items-center overflow-visible">
+
+          <img
             src={assets.logo}
             alt="logo"
-            className="h-12 sm:h-14"
+            className="h-10 w-auto scale-[4.5] origin-left object-contain"
           />
+
         </Link>
-      </div>
 
-      {/* Menu */}
-      <div
-        className={`flex-1 max-sm:fixed max-sm:h-screen max-sm:w-full max-sm:top-16 max-sm:left-0 max-sm:border-t border-borderColor flex flex-col sm:flex-row items-start sm:items-center justify-center gap-4 sm:gap-8 max-sm:p-4 transition-all duration-300 z-50 ${location.pathname === '/' ? 'bg-light' : 'bg-white'} ${open ? 'max-sm:translate-x-0' : 'max-sm:translate-x-full'}`}
-      >
-        {menuLinks.map((link, index) => (
-          <Link key={index} to={link.path} className="whitespace-nowrap">
-            {link.name}
-          </Link>
-        ))}
+        {/* Desktop Menu */}
+        <div className="hidden md:flex items-center gap-10">
 
-        {/* Search Bar */}
-        <div className="hidden lg:flex items-center text-sm gap-2 border border-borderColor px-3 py-1.5 rounded-full max-w-48">
-          <input
-            type="text"
-            className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500 text-sm"
-            placeholder="Search Bike"
-          />
-          <img
-            src={assets.search_icon}
-            alt="search"
-            className="w-5 h-5"
-          />
-        </div>
-      </div>
+          {menuLinks.map((link, index) => (
 
-      <div className="flex-shrink-0 flex items-center gap-3 sm:gap-6 ml-2 sm:ml-4">
+            <Link
+              key={index}
+              to={link.path}
+              className={`relative text-sm font-medium transition-all duration-300
+              ${
+                isHome
+                  ? 'text-gray-300 hover:text-white'
+                  : 'text-gray-700 hover:text-black'
+              }`}
+            >
 
-        {/* Dashboard */}
-        <button
-          onClick={() => isOwner ? navigate('/owner') : navigate('/')}
-          className="cursor-pointer whitespace-nowrap text-sm sm:text-base"
-        >
-          {isOwner && 'Dashboard'}
-        </button>
+              {link.name}
 
-        {/* Welcome First Name Only */}
-        {user && (
-          <p className="text-gray-700 whitespace-nowrap font-medium text-sm sm:text-base">
-            Welcome, {firstName}
-          </p>
-        )}
+              {location.pathname === link.path && (
 
-        {/* Time + Day + Date */}
-        <div className="w-[95px] sm:w-[120px] text-center leading-tight">
-          <div className="font-mono text-sm sm:text-lg font-semibold text-gray-800">
-            {formattedTime}
-          </div>
-          <div className="text-[10px] sm:text-xs text-gray-500 font-medium">
-            {formattedDay}, {formattedDate}
-          </div>
+                <span
+                  className={`absolute left-0 -bottom-2 w-full h-[2px] rounded-full
+                  ${isHome ? 'bg-white' : 'bg-black'}`}
+                ></span>
+
+              )}
+
+            </Link>
+
+          ))}
+
         </div>
 
-        {/* Login / Logout */}
-        <button
-          onClick={() => { user ? logout() : setShowLogin(true) }}
-          className="flex items-center gap-2 px-3 sm:px-6 py-2 rounded-lg border border-blue-600
-          text-blue-600 bg-transparent hover:bg-blue-600 hover:text-white
-          transition-all duration-300 whitespace-nowrap text-sm sm:text-base"
-        >
-          {!user && (
-            <img src={assets.user_icon} alt="user" className="w-4 h-4 sm:w-5 sm:h-5" />
-          )}
-          {user ? 'Logout' : 'Login'}
-        </button>
+        {/* Right Side */}
+        <div className="hidden md:flex items-center gap-5">
 
-        {/* Mobile Menu Button */}
+          {/* Time */}
+          <div className={`w-[120px] text-center leading-tight ${textColor}`}>
+
+            <div className="font-mono text-lg font-semibold">
+              {formattedTime}
+            </div>
+
+            <div className={`text-xs font-medium ${subText}`}>
+              {formattedDate}
+            </div>
+
+          </div>
+
+          {/* Login */}
+          <button
+            onClick={() => {
+              user ? logout() : setShowLogin(true);
+            }}
+            className={`flex items-center gap-2 border px-5 py-2 rounded-xl text-sm font-medium transition-all duration-300
+            ${
+              isHome
+                ? 'border-white/40 text-white hover:bg-white hover:text-black'
+                : 'border-black/20 text-black hover:bg-black hover:text-white'
+            }`}
+          >
+
+            <img
+              src={assets.user_icon}
+              alt="user"
+              className={`w-4 h-4 ${isHome ? 'invert' : ''}`}
+            />
+
+            {user ? 'Logout' : 'Login'}
+
+          </button>
+
+        </div>
+
+        {/* Mobile Button */}
         <button
-          className="sm:hidden cursor-pointer ml-1"
-          aria-label="Menu"
           onClick={() => setOpen(!open)}
+          className={`md:hidden ${textColor}`}
         >
-          <img src={open ? assets.close_icon : assets.menu_icon} alt="menu" />
+
+          {open ? <X size={28} /> : <Menu size={28} />}
+
         </button>
 
       </div>
-    </motion.div>
+
+      {/* Mobile Menu */}
+      {open && (
+
+        <div
+          className={`md:hidden mx-5 mt-2 rounded-2xl backdrop-blur-lg p-6 flex flex-col gap-5
+          ${
+            isHome
+              ? 'bg-black/90'
+              : 'bg-white shadow-lg'
+          }`}
+        >
+
+          {/* Mobile Time */}
+          <div className={`text-center leading-tight ${textColor}`}>
+
+            <div className="font-mono text-lg font-semibold">
+              {formattedTime}
+            </div>
+
+            <div className={`text-xs font-medium ${subText}`}>
+              {formattedDate}
+            </div>
+
+          </div>
+
+          {/* Mobile Links */}
+          {menuLinks.map((link, index) => (
+
+            <Link
+              key={index}
+              to={link.path}
+              onClick={() => setOpen(false)}
+              className={`text-base transition
+              ${
+                isHome
+                  ? 'text-white hover:text-gray-300'
+                  : 'text-black hover:text-gray-500'
+              }`}
+            >
+
+              {link.name}
+
+            </Link>
+
+          ))}
+
+          {/* Mobile Login */}
+          <button
+            onClick={() => {
+              user ? logout() : setShowLogin(true);
+            }}
+            className={`flex items-center justify-center gap-2 border px-5 py-3 rounded-xl transition-all
+            ${
+              isHome
+                ? 'border-white/40 text-white hover:bg-white hover:text-black'
+                : 'border-black/20 text-black hover:bg-black hover:text-white'
+            }`}
+          >
+
+            <img
+              src={assets.user_icon}
+              alt="user"
+              className={`w-4 h-4 ${isHome ? 'invert' : ''}`}
+            />
+
+            {user ? 'Logout' : 'Login'}
+
+          </button>
+
+        </div>
+
+      )}
+
+    </motion.nav>
   );
 };
 

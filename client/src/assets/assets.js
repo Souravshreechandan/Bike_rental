@@ -1,4 +1,4 @@
-import logo from "./logo.svg";
+import logo from "./logo.png";
 import gmail_logo from "./gmail_logo.svg";
 import facebook_logo from "./facebook_logo.svg";
 import instagram_logo from "./instagram_logo.svg";
@@ -41,6 +41,7 @@ import bike_image1 from "./bike_image1.png"
 import bike_image2 from "./bike_image2.png"
 import bike_image3 from "./bike_image3.png"
 import bike_image4 from "./bike_image4.png"
+import hero_bg from './hero_bg.png'
 
 export const cityList = ['Bhubaneswar', 'Cuttack']
 
@@ -87,7 +88,8 @@ export const assets = {
     user_profile,
     bike_image2,
     bike_image3,
-    bike_image4
+    bike_image4,
+    hero_bg
 }
 
 export const menuLinks = [
