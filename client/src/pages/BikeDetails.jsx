@@ -116,7 +116,7 @@ const isSlotDisabled = (slotValue) => {
   ) {
     return true;
   }
-
+  
   // Disable already booked pickup slots
   if (bookedSlots.includes(slotValue)) {
     return true;

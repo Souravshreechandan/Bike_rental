@@ -41,17 +41,7 @@ const MyBookings = () => {
   };
 
   useEffect(() => {
-    if (user) {
-      fetchMyBookings();
-      const interval = setInterval(() => {
-
-        fetchMyBookings();
-
-      }, 5000);
-
-      return () => clearInterval(interval);
-    }
-
+    if (user) fetchMyBookings();
   }, [user]);
 
   // Handle paying remaining amount via Razorpay

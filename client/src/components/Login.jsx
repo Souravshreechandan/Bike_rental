@@ -15,7 +15,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 🔒 Disable background scroll when modal opens
+  //  Disable background scroll when modal opens
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
