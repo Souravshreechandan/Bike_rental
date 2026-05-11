@@ -20,15 +20,16 @@ const Testimonial = () => {
             location: "Cuttack",
             image: assets.testimonial_image_1,
             testimonial:
-                "BikeRental made my trip so much easier. The bike was delivered right to my door, and the customer service was fantastic!"
-        },
+                "BikeRental provided a good experience overall. The bike was in great condition, and the booking process was simple."
+        },   
+
 
         {
             name: "Srikant",
             location: "Bhubaneswar",
             image: assets.testimonial_image_1,
             testimonial:
-                "Fantastic experience! From start to finish, the team was professional, responsive, and genuinely cared about delivering great results."
+                "Fantastic experience! From start to finish, the team was professional, responsive, friendly and supportive."
         }
     ]
 
