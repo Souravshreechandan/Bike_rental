@@ -108,7 +108,7 @@ const AddBike = () => {
                         </div>
 
                         <div className='flex flex-col w-full'>
-                            <label>Daily Price ({currency})</label>
+                            <label>Price/hr ({currency})</label>
                             <input type="number" placeholder='100' required
                                 className='px-3 py-2 mt-1 border border-borderColor rounded-md outline-none'
                                 value={bike.pricePerDay} onChange={e => setBike({ ...bike, pricePerDay: e.target.value })} />
