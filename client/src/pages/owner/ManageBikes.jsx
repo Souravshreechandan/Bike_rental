@@ -227,7 +227,7 @@ const ManageBikes = () => {
                   <td className="p-3">{bike.category}</td>
                   <td className="p-3">
                     {currency}
-                    {bike.pricePerDay}/day
+                    {bike.pricePerDay}/hr
                   </td>
                   <td className="p-3">
                     <span
